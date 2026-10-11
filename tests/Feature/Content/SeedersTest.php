@@ -9,6 +9,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Elaf\Content\Application\ContentPermission as P;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
 use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
+use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -19,8 +20,8 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
     $this->seed(RolesAndPermissionsSeeder::class);
     $user = User::factory()->create()->assignRole($role->value);
 
-    foreach (P::cases() as $permission) {
-        expect(Gate::forUser($user)->allows($permission->value))
+    foreach (RolesAndPermissionsSeeder::permissions() as $permission) {
+        expect(Gate::forUser($user)->allows((string) $permission->value))
             ->toBe(in_array($permission, $allowed, true), "{$role->value} / {$permission->value}");
     }
 })->with([
@@ -28,7 +29,7 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
     'contributor' => [Role::Contributor, [P::CreateArticles]],
     'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors]],
     'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, P::PublishArticles, P::PromoteArticles]],
-    'admin' => [Role::Admin, P::cases()],
+    'admin' => [Role::Admin, [...P::cases(), IdentityPermission::ManageUsers]],
 ]);
 
 it('seeds the paper\'s twelve sections once, without overwriting edits (FR-TAX-01)', function (): void {

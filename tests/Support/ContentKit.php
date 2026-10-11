@@ -17,6 +17,8 @@ use Elaf\Content\Application\Series\SeriesRepository;
 use Elaf\Content\Application\Tag\TagQueries;
 use Elaf\Content\Application\Tag\TagRepository;
 use Elaf\Content\Domain\Article\ArticleRepository;
+use Elaf\Identity\Application\StaffUser\PasswordHasher;
+use Elaf\Identity\Application\StaffUser\StaffUserRepository;
 use Elaf\Shared\Application\Authorization\Authorizer;
 use Elaf\Shared\Application\Event\EventDispatcher;
 use Elaf\Shared\Application\Html\HtmlSanitizer;
@@ -27,6 +29,7 @@ use Elaf\Shared\Infrastructure\Html\HtmlPurifierSanitizer;
 use LogicException;
 use ReflectionClass;
 use ReflectionNamedType;
+use Tests\Support\Fakes\FakePasswordHasher;
 use Tests\Support\Fakes\FrozenClock;
 use Tests\Support\Fakes\ImmediateTransaction;
 use Tests\Support\Fakes\InMemoryArticleRepository;
@@ -35,11 +38,12 @@ use Tests\Support\Fakes\InMemoryAuthorizer;
 use Tests\Support\Fakes\InMemoryAuthorRepository;
 use Tests\Support\Fakes\InMemoryCategoryRepository;
 use Tests\Support\Fakes\InMemorySeriesRepository;
+use Tests\Support\Fakes\InMemoryStaffUserRepository;
 use Tests\Support\Fakes\InMemoryTagRepository;
 use Tests\Support\Fakes\RecordingEventDispatcher;
 
 /**
- * Content use cases wired to in-memory fakes, no framework (PRD §14,
+ * Use cases wired to in-memory fakes, no framework (PRD §14,
  * "Application" level). make() builds any handler from the fakes.
  */
 final class ContentKit
@@ -66,6 +70,8 @@ final class ContentKit
 
     public readonly HtmlSanitizer $sanitizer;
 
+    public readonly InMemoryStaffUserRepository $users;
+
     /** @var array<class-string, object> */
     private array $bindings;
 
@@ -82,6 +88,7 @@ final class ContentKit
         $this->tags = new InMemoryTagRepository;
         $this->revisions = new InMemoryArticleRevisions;
         $this->sanitizer = new HtmlPurifierSanitizer;
+        $this->users = new InMemoryStaffUserRepository;
 
         $this->bindings = [
             Clock::class => $this->clock,
@@ -97,6 +104,8 @@ final class ContentKit
             TagQueries::class => $this->tags,
             ArticleRevisions::class => $this->revisions,
             HtmlSanitizer::class => $this->sanitizer,
+            StaffUserRepository::class => $this->users,
+            PasswordHasher::class => new FakePasswordHasher,
         ];
     }
 
