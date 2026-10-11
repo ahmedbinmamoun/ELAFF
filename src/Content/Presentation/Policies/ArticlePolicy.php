@@ -6,7 +6,9 @@ namespace Elaf\Content\Presentation\Policies;
 
 use App\Models\User;
 use Elaf\Content\Application\Article\ArticleAccess;
+use Elaf\Content\Application\Article\EditorialSettings;
 use Elaf\Content\Application\ContentPermission;
+use Elaf\Content\Domain\Article\ArticleOrigin;
 use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
 use Elaf\Identity\Domain\UserId;
@@ -19,7 +21,10 @@ use Illuminate\Contracts\Auth\Access\Gate;
  */
 final readonly class ArticlePolicy
 {
-    public function __construct(private Gate $gate) {}
+    public function __construct(
+        private Gate $gate,
+        private EditorialSettings $settings,
+    ) {}
 
     public function viewAny(User $user): bool
     {
@@ -50,6 +55,14 @@ final readonly class ArticlePolicy
         return $this->access($user)->canSubmit(UserId::fromInt($user->id), UserId::fromInt($article->created_by));
     }
 
+    /**
+     * Publish or schedule (FR-CON-08 lets editors publish contributor articles).
+     */
+    public function publish(User $user, ArticleModel $article): bool
+    {
+        return $this->access($user)->canPublish(ArticleOrigin::from($article->origin));
+    }
+
     public function delete(User $user, ArticleModel $article): bool
     {
         return false;
@@ -62,6 +75,6 @@ final readonly class ArticlePolicy
 
     private function access(User $user): ArticleAccess
     {
-        return new ArticleAccess(new UserAuthorizer($this->gate, $user));
+        return new ArticleAccess(new UserAuthorizer($this->gate, $user), $this->settings);
     }
 }

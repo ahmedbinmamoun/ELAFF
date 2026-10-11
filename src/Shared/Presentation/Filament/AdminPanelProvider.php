@@ -9,6 +9,7 @@ use Elaf\Content\Presentation\Filament\Resources\Authors\AuthorResource;
 use Elaf\Content\Presentation\Filament\Resources\Categories\CategoryResource;
 use Elaf\Content\Presentation\Filament\Resources\Series\SeriesResource;
 use Elaf\Content\Presentation\Filament\Resources\Tags\TagResource;
+use Elaf\Contributors\Presentation\Filament\Admin\Contributors\ContributorResource;
 use Elaf\Identity\Presentation\Filament\Resources\Users\UserResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -48,6 +49,7 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->resources([
                 ArticleResource::class,
+                ContributorResource::class,
                 CategoryResource::class,
                 TagResource::class,
                 SeriesResource::class,

@@ -64,6 +64,12 @@ const WRITE_PORTS = [
     'Elaf\Content\Application\Series\SeriesRepository',
     'Elaf\Content\Application\Author\AuthorRepository',
     'Elaf\Identity\Application\StaffUser\StaffUserRepository',
+    'Elaf\Identity\Application\RoleAssignments',
+    'Elaf\Contributors\Domain\ContributorRepository',
+    'Elaf\Contributors\Application\ContributorAccounts',
+    'Elaf\Contributors\Application\AuthorProfiles',
+    'Elaf\Contributors\Infrastructure\Persistence\EloquentContributorRepository',
+    'Elaf\Contributors\Infrastructure\Persistence\EloquentContributorAccounts',
     'Elaf\Content\Infrastructure\Persistence\Eloquent',
     'Elaf\Identity\Infrastructure',
 ];

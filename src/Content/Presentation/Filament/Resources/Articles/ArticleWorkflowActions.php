@@ -117,7 +117,7 @@ final class ArticleWorkflowActions
     public static function publish(): Action
     {
         return self::make('publish', Heroicon::OutlinedGlobeAlt, 'success',
-            static fn (ArticleModel $a): bool => self::can($a, ArticleStatus::Published, ContentPermission::PublishArticles),
+            static fn (ArticleModel $a): bool => self::can($a, ArticleStatus::Published) && Gate::allows('publish', $a),
             static fn (ArticleModel $a, array $d, int $actor) => app(PublishArticleHandler::class)->handle(new PublishArticleCommand($actor, $a->id)),
         )->requiresConfirmation();
     }
@@ -125,7 +125,7 @@ final class ArticleWorkflowActions
     public static function schedule(): Action
     {
         return self::make('schedule', Heroicon::OutlinedClock, 'info',
-            static fn (ArticleModel $a): bool => self::can($a, ArticleStatus::Scheduled, ContentPermission::PublishArticles),
+            static fn (ArticleModel $a): bool => self::can($a, ArticleStatus::Scheduled) && Gate::allows('publish', $a),
             static fn (ArticleModel $a, array $d, int $actor) => app(ScheduleArticleHandler::class)->handle(
                 new ScheduleArticleCommand($actor, $a->id, self::moment($d['publish_at'] ?? null) ?? new DateTimeImmutable('@0')),
             ),
@@ -203,7 +203,9 @@ final class ArticleWorkflowActions
 
                 if ($livewire instanceof EditRecord || $livewire instanceof ViewRecord) {
                     $page = Gate::allows('update', $record) ? 'edit' : 'view';
-                    $action->redirect(ArticleResource::getUrl($page, ['record' => $record]));
+                    /** @var class-string<\Filament\Resources\Resource> $resource */
+                    $resource = $livewire::getResource();
+                    $action->redirect($resource::getUrl($page, ['record' => $record]));
                 }
             });
     }
