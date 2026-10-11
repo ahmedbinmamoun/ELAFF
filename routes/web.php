@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Route;
-
-Route::view('/', 'home')->name('home');
+/*
+ * Module routes are registered by each module's presentation service provider
+ * (e.g. src/Content/Presentation/Http/routes.php).
+ */
