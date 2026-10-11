@@ -1,5 +1,9 @@
 # ADR-0003 — Design tokens with Tailwind CSS v4
 
+> Amended 2026-10-12 (UI redesign): tokens moved to `tailwind.config.js`,
+> loaded with `@config`, as PRD §10 asks. Component CSS reads them with
+> `theme()`; Tailwind v4 does not emit CSS variables for JS-config tokens.
+
 - Status: accepted
 - Date: 2026-10-11
 
