@@ -112,12 +112,20 @@ it('round-trips through its snapshot array (revisions)', function (): void {
         seoTitle: 'عنوان محركات البحث',
         seoDescription: 'وصف',
         canonicalUrl: 'https://elaf.example/article/1',
+        printSection: 'تحقيق',
     );
 
     $restored = ArticleContent::fromArray(json_decode((string) json_encode($content->toArray()), true));
 
     expect($restored->equals($content))->toBeTrue()
         ->and($restored->diff($content))->toBe([]);
+});
+
+it('reads snapshots stored before print_section existed', function (): void {
+    $old = Articles::content()->toArray();
+    unset($old['print_section']);
+
+    expect(ArticleContent::fromArray($old)->printSection)->toBeNull();
 });
 
 it('rejects malformed snapshots', function (array $data): void {

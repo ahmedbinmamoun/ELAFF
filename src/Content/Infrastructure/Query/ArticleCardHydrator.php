@@ -25,7 +25,7 @@ final readonly class ArticleCardHydrator
     public const CARD_COLUMNS = [
         'a.id', 'a.title', 'a.slug', 'a.kicker', 'a.excerpt', 'a.published_at', 'a.featured_image_path',
         'a.featured_image_caption', 'a.featured_image_credit', 'a.reading_minutes', 'a.origin',
-        'c.id as category_id', 'c.name as category_name', 'c.slug as category_slug',
+        'c.id as category_id', 'c.name as category_name', 'c.slug as category_slug', 'c.icon as category_icon',
     ];
 
     public function __construct(private ConnectionInterface $db) {}
@@ -57,7 +57,7 @@ final readonly class ArticleCardHydrator
             kicker: self::nullable($r, 'kicker'),
             excerpt: self::nullable($r, 'excerpt'),
             publishedAt: self::date($r, 'published_at'),
-            category: new CategoryRef(self::int($r, 'category_id'), self::string($r, 'category_name'), self::string($r, 'category_slug')),
+            category: new CategoryRef(self::int($r, 'category_id'), self::string($r, 'category_name'), self::string($r, 'category_slug'), self::nullable($r, 'category_icon')),
             authors: $authors[self::int($r, 'id')] ?? [],
             image: self::nullable($r, 'featured_image_path') === null ? null : new ImageRef(
                 self::string($r, 'featured_image_path'),

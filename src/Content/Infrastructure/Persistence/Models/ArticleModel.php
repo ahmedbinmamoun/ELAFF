@@ -26,6 +26,7 @@ use Spatie\Activitylog\Models\Activity;
  * @property int|null $series_part
  * @property int|null $issue_id
  * @property int|null $issue_page
+ * @property string|null $print_section
  * @property string|null $kicker
  * @property string $title
  * @property string|null $subtitle

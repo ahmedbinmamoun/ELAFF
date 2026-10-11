@@ -27,7 +27,7 @@ final readonly class EloquentTaxonomyQueries implements TaxonomyQueries
             ->where('is_visible', true)
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get(['id', 'name', 'slug'])
+            ->get(['id', 'name', 'slug', 'icon'])
             ->map(static fn (mixed $r): CategoryRef => self::categoryRef(self::row($r)))
             ->all());
     }
@@ -103,6 +103,7 @@ final readonly class EloquentTaxonomyQueries implements TaxonomyQueries
             ArticleCardHydrator::int($row, 'id'),
             ArticleCardHydrator::string($row, 'name'),
             ArticleCardHydrator::string($row, 'slug'),
+            ArticleCardHydrator::nullable($row, 'icon'),
         );
     }
 

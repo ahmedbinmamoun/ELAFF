@@ -61,6 +61,7 @@ function contract_article(ArticleRepository $repository, ContentFixtures $fx, Fr
         seoTitle: 'عنوان SEO',
         seoDescription: 'وصف',
         canonicalUrl: 'https://example.com/canonical',
+        printSection: 'حوار',
     );
 
     $article = Article::draft($repository->nextId(), ArticleOrigin::Contributor, $writer, $content, $clock);

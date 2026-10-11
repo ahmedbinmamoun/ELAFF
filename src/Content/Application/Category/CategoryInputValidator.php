@@ -34,7 +34,22 @@ final readonly class CategoryInputValidator
             isOpenToContributors: $input->isOpenToContributors,
             seoTitle: Fields::optional('seo_title', $input->seoTitle, 255),
             seoDescription: Fields::optional('seo_description', $input->seoDescription, 500),
+            icon: $this->icon($input->icon),
         );
+    }
+
+    /**
+     * An icon key from the site's icon set (the UI offers the choices).
+     */
+    private function icon(?string $icon): ?string
+    {
+        $icon = Fields::optional('icon', $icon, 40);
+
+        if ($icon !== null && preg_match('/^[a-z0-9-]+$/', $icon) !== 1) {
+            throw InvalidInput::because('icon', 'invalid_icon', 'The icon key is not valid.');
+        }
+
+        return $icon;
     }
 
     /**

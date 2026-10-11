@@ -32,6 +32,9 @@ final readonly class ArticleContent
 
     public ?string $canonicalUrl;
 
+    /** Section of the printed paper the article appeared in, e.g. "حوار". */
+    public ?string $printSection;
+
     /** @var list<AuthorId> */
     public array $authorIds;
 
@@ -59,6 +62,7 @@ final readonly class ArticleContent
         ?string $seoTitle = null,
         ?string $seoDescription = null,
         ?string $canonicalUrl = null,
+        ?string $printSection = null,
     ) {
         $this->authorIds = self::unique('authors', $authorIds);
         $tagIds = self::unique('tags', $tagIds);
@@ -71,6 +75,7 @@ final readonly class ArticleContent
         $this->seoTitle = self::text('SEO title', $seoTitle, 255);
         $this->seoDescription = self::text('SEO description', $seoDescription, 500);
         $this->canonicalUrl = self::text('canonical URL', $canonicalUrl, 2048);
+        $this->printSection = self::text('print section', $printSection, 60);
 
         if ($this->canonicalUrl !== null && ! OptionalText::isHttpUrl($this->canonicalUrl)) {
             throw InvalidArticleContent::invalidUrl('canonical URL', $this->canonicalUrl);
@@ -149,6 +154,7 @@ final readonly class ArticleContent
             'seo_title' => $this->seoTitle,
             'seo_description' => $this->seoDescription,
             'canonical_url' => $this->canonicalUrl,
+            'print_section' => $this->printSection,
         ];
     }
 
@@ -181,6 +187,7 @@ final readonly class ArticleContent
             seoTitle: self::optionalString($data, 'seo_title'),
             seoDescription: self::optionalString($data, 'seo_description'),
             canonicalUrl: self::optionalString($data, 'canonical_url'),
+            printSection: self::optionalString($data, 'print_section'),
         );
     }
 

@@ -20,5 +20,6 @@ final readonly class CategoryInput
         public bool $isOpenToContributors = false,
         public ?string $seoTitle = null,
         public ?string $seoDescription = null,
+        public ?string $icon = null,
     ) {}
 }

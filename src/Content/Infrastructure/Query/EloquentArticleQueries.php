@@ -167,6 +167,33 @@ final readonly class EloquentArticleQueries implements ArticleQueries
             ->get(ArticleCardHydrator::CARD_COLUMNS));
     }
 
+    public function mostRead(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->cards->cards($this->cards->published()
+            ->when($since !== null, static fn (Builder $q) => $q->where('a.published_at', '>=', LocalTime::format($since ?? new DateTimeImmutable)))
+            ->orderByDesc('a.views_count')
+            ->orderByDesc('a.published_at')
+            ->orderByDesc('a.id')
+            ->limit($limit)
+            ->get(ArticleCardHydrator::CARD_COLUMNS));
+    }
+
+    public function cards(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter($ids, static fn (int $id): bool => $id > 0)));
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $byId = [];
+        foreach ($this->cards->cards($this->cards->published()->whereIn('a.id', $ids)->get(ArticleCardHydrator::CARD_COLUMNS)) as $card) {
+            $byId[$card->id] = $card;
+        }
+
+        return array_values(array_filter(array_map(static fn (int $id): ?ArticleCard => $byId[$id] ?? null, $ids)));
+    }
+
     public function columnists(int $limit): array
     {
         $ranked = $this->db->table('authors as au')
