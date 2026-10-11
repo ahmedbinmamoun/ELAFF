@@ -6,7 +6,6 @@ namespace Elaf\Content\Application\Article\ScheduleArticle;
 
 use Elaf\Content\Application\Article\ArticleAccess;
 use Elaf\Content\Application\Article\ArticleUnitOfWork;
-use Elaf\Content\Application\ContentPermission;
 use Elaf\Content\Domain\Article\ArticleId;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Shared\Domain\Time\Clock;
@@ -24,8 +23,8 @@ final readonly class ScheduleArticleHandler
 
     public function handle(ScheduleArticleCommand $command): void
     {
-        $this->access->require(ContentPermission::PublishArticles);
         $article = $this->articles->load(ArticleId::fromInt($command->articleId));
+        $this->access->requireCanPublish($article);
 
         $article->schedule($command->publishAt, UserId::fromInt($command->actorId), $this->clock);
         $this->articles->persist($article);

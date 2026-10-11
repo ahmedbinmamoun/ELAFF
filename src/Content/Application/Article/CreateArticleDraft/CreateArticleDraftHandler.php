@@ -7,6 +7,7 @@ namespace Elaf\Content\Application\Article\CreateArticleDraft;
 use Elaf\Content\Application\Article\ArticleAccess;
 use Elaf\Content\Application\Article\ArticleContentFactory;
 use Elaf\Content\Application\Article\ArticleUnitOfWork;
+use Elaf\Content\Application\Article\ContributorByline;
 use Elaf\Content\Application\Article\Revision\ArticleRevisions;
 use Elaf\Content\Application\ContentPermission;
 use Elaf\Content\Domain\Article\Article;
@@ -22,6 +23,7 @@ final readonly class CreateArticleDraftHandler
         private ArticleContentFactory $contentFactory,
         private ArticleRevisions $revisions,
         private ArticleAccess $access,
+        private ContributorByline $byline,
         private Transaction $transaction,
         private Clock $clock,
     ) {}
@@ -32,7 +34,8 @@ final readonly class CreateArticleDraftHandler
         $actor = UserId::fromInt($command->actorId);
 
         return $this->transaction->run(function () use ($command, $actor): ArticleId {
-            $content = $this->contentFactory->create($command->article, $command->origin);
+            $input = $this->byline->apply($command->article, $command->origin, $actor, $actor);
+            $content = $this->contentFactory->create($input, $command->origin);
             $article = Article::draft($this->articles->nextId(), $command->origin, $actor, $content, $this->clock);
 
             $this->articles->persist($article, fn (Article $saved) => $this->revisions->record(

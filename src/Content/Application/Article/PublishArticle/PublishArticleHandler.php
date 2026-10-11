@@ -6,7 +6,6 @@ namespace Elaf\Content\Application\Article\PublishArticle;
 
 use Elaf\Content\Application\Article\ArticleAccess;
 use Elaf\Content\Application\Article\ArticleUnitOfWork;
-use Elaf\Content\Application\ContentPermission;
 use Elaf\Content\Domain\Article\ArticleId;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Shared\Domain\Time\Clock;
@@ -27,7 +26,7 @@ final readonly class PublishArticleHandler
         $actor = UserId::fromInt($command->actorId);
         $article = $this->articles->load(ArticleId::fromInt($command->articleId));
 
-        $this->access->require(ContentPermission::PublishArticles);
+        $this->access->requireCanPublish($article);
 
         $article->publish($actor, $this->clock);
         $this->articles->persist($article);

@@ -32,6 +32,9 @@ final readonly class ArticleContentFactory
 {
     public const MAX_BODY_LENGTH = 200_000;
 
+    /** FR-CON-10. */
+    public const MAX_CONTRIBUTOR_BODY_LENGTH = 40_000;
+
     public function __construct(
         private CategoryRepository $categories,
         private AuthorRepository $authors,
@@ -69,8 +72,10 @@ final readonly class ArticleContentFactory
 
     private function body(string $html, ArticleOrigin $origin): ArticleBody
     {
-        if (mb_strlen($html) > self::MAX_BODY_LENGTH) {
-            throw InvalidInput::tooLong('body', self::MAX_BODY_LENGTH);
+        $max = $origin === ArticleOrigin::Contributor ? self::MAX_CONTRIBUTOR_BODY_LENGTH : self::MAX_BODY_LENGTH;
+
+        if (mb_strlen($html) > $max) {
+            throw InvalidInput::tooLong('body', $max);
         }
 
         $profile = $origin === ArticleOrigin::Contributor ? SanitizerProfile::Contributor : SanitizerProfile::Staff;
