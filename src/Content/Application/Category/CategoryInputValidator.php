@@ -57,7 +57,7 @@ final readonly class CategoryInputValidator
 
         while ($self !== null && $ancestor !== null) {
             if ($ancestor->id->equals($self)) {
-                throw new InvalidInput('parent_id', 'A category cannot be nested under itself or its own subcategory.');
+                throw InvalidInput::because('parent_id', 'category_cycle', 'A category cannot be nested under itself or its own subcategory.');
             }
 
             $ancestor = $ancestor->data->parentId === null ? null : $this->categories->find($ancestor->data->parentId);

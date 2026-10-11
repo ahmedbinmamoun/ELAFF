@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use BackedEnum;
 use Elaf\Content\Application\ContentPermission;
+use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as RoleModel;
 use Spatie\Permission\PermissionRegistrar;
+use UnitEnum;
 
 /**
  * The PRD §2 permission matrix. Idempotent: re-running syncs each role to
@@ -18,7 +21,15 @@ use Spatie\Permission\PermissionRegistrar;
 final class RolesAndPermissionsSeeder extends Seeder
 {
     /**
-     * @return array<string, list<ContentPermission>>
+     * @return list<BackedEnum&UnitEnum>
+     */
+    public static function permissions(): array
+    {
+        return [...ContentPermission::cases(), ...IdentityPermission::cases()];
+    }
+
+    /**
+     * @return array<string, list<BackedEnum>>
      */
     public static function matrix(): array
     {
@@ -37,7 +48,7 @@ final class RolesAndPermissionsSeeder extends Seeder
             Role::Contributor->value => $writer,
             Role::Editor->value => $editor,
             Role::EditorInChief->value => $editorInChief,
-            Role::Admin->value => ContentPermission::cases(),
+            Role::Admin->value => self::permissions(),
         ];
     }
 
@@ -45,13 +56,13 @@ final class RolesAndPermissionsSeeder extends Seeder
     {
         $registrar->forgetCachedPermissions();
 
-        foreach (ContentPermission::cases() as $permission) {
-            Permission::findOrCreate($permission->value, 'web');
+        foreach (self::permissions() as $permission) {
+            Permission::findOrCreate((string) $permission->value, 'web');
         }
 
         foreach (self::matrix() as $role => $permissions) {
             RoleModel::findOrCreate($role, 'web')->syncPermissions(
-                array_map(static fn (ContentPermission $p): string => $p->value, $permissions),
+                array_map(static fn (BackedEnum $p): string => (string) $p->value, $permissions),
             );
         }
 

@@ -14,4 +14,11 @@ interface TagRepository
     public function find(TagId $id): ?Tag;
 
     public function findBySlug(Slug $slug): ?Tag;
+
+    public function rename(TagId $id, string $name, Slug $slug): void;
+
+    /**
+     * Also removes the tag from its articles.
+     */
+    public function delete(TagId $id): void;
 }

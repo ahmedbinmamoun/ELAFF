@@ -29,6 +29,16 @@ final class EloquentTagRepository implements TagQueries, TagRepository
         return $this->toDto(TagModel::query()->where('slug', $slug->value)->first());
     }
 
+    public function rename(TagId $id, string $name, Slug $slug): void
+    {
+        TagModel::query()->whereKey($id->value)->update(['name' => $name, 'slug' => $slug->value]);
+    }
+
+    public function delete(TagId $id): void
+    {
+        TagModel::query()->whereKey($id->value)->delete();
+    }
+
     public function suggest(string $prefix, int $limit = 10): array
     {
         $prefix = trim($prefix);

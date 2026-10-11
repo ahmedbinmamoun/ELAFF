@@ -10,7 +10,7 @@ make up      # creates .env, builds images, installs deps, migrates
 make check   # Pint + Larastan (max) + Pest on MySQL
 ```
 
-Site: http://localhost:8080 · Health: http://localhost:8080/up · Mail: http://localhost:8025
+Site: http://localhost:8080 · Admin: http://localhost:8080/admin · Health: http://localhost:8080/up · Mail: http://localhost:8025
 
 Other targets: `make help`.
 

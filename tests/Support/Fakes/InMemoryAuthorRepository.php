@@ -17,9 +17,11 @@ final class InMemoryAuthorRepository implements AuthorRepository
     /** @var array<int, AuthorData> */
     private array $rows = [];
 
+    private int $lastId = 0;
+
     public function create(AuthorData $data): AuthorId
     {
-        $id = count($this->rows) + 1;
+        $id = ++$this->lastId;
         $this->rows[$id] = $data;
 
         return AuthorId::fromInt($id);
@@ -59,5 +61,26 @@ final class InMemoryAuthorRepository implements AuthorRepository
         }
 
         return false;
+    }
+
+    /** @var array<int, true> */
+    private array $usedByArticles = [];
+
+    /**
+     * Test setup: pretend an article references this record.
+     */
+    public function markUsedByArticle(AuthorId $id): void
+    {
+        $this->usedByArticles[$id->value] = true;
+    }
+
+    public function hasArticles(AuthorId $id): bool
+    {
+        return isset($this->usedByArticles[$id->value]);
+    }
+
+    public function delete(AuthorId $id): void
+    {
+        unset($this->rows[$id->value]);
     }
 }

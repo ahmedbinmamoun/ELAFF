@@ -45,6 +45,19 @@ final class EloquentAuthorRepository implements AuthorRepository
             ->exists();
     }
 
+    public function hasArticles(AuthorId $id): bool
+    {
+        return AuthorModel::query()->getConnection()->table('article_author')->where('author_id', $id->value)->exists();
+    }
+
+    /**
+     * Soft delete: the slug stays reserved (see slugExists()).
+     */
+    public function delete(AuthorId $id): void
+    {
+        AuthorModel::query()->whereKey($id->value)->delete();
+    }
+
     private function toDto(?AuthorModel $model): ?Author
     {
         return $model === null ? null : new Author(AuthorId::fromInt($model->id), new AuthorData(

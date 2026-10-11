@@ -25,6 +25,7 @@ install: ## composer install, app key, migrations
 	$(EXEC) composer install --no-interaction
 	@grep -q '^APP_KEY=base64' .env || $(EXEC) php artisan key:generate --ansi
 	$(EXEC) php artisan migrate --force
+	@test -L public/storage || $(EXEC) php artisan storage:link
 
 migrate: ## Run migrations
 	$(EXEC) php artisan migrate

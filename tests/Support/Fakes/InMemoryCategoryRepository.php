@@ -16,9 +16,11 @@ final class InMemoryCategoryRepository implements CategoryRepository
     /** @var array<int, CategoryData> */
     private array $rows = [];
 
+    private int $lastId = 0;
+
     public function create(CategoryData $data): CategoryId
     {
-        $id = count($this->rows) + 1;
+        $id = ++$this->lastId;
         $this->rows[$id] = $data;
 
         return CategoryId::fromInt($id);
@@ -47,5 +49,37 @@ final class InMemoryCategoryRepository implements CategoryRepository
         }
 
         return false;
+    }
+
+    /** @var array<int, true> */
+    private array $usedByArticles = [];
+
+    /**
+     * Test setup: pretend an article references this record.
+     */
+    public function markUsedByArticle(CategoryId $id): void
+    {
+        $this->usedByArticles[$id->value] = true;
+    }
+
+    public function hasArticles(CategoryId $id): bool
+    {
+        return isset($this->usedByArticles[$id->value]);
+    }
+
+    public function hasChildren(CategoryId $id): bool
+    {
+        foreach ($this->rows as $data) {
+            if ($data->parentId?->equals($id) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function delete(CategoryId $id): void
+    {
+        unset($this->rows[$id->value]);
     }
 }

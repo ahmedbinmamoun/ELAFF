@@ -8,6 +8,7 @@ use Elaf\Content\Application\Series\Series;
 use Elaf\Content\Application\Series\SeriesData;
 use Elaf\Content\Application\Series\SeriesRepository;
 use Elaf\Content\Domain\Series\SeriesId;
+use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
 use Elaf\Content\Infrastructure\Persistence\Models\SeriesModel;
 use Elaf\Shared\Domain\Text\Slug;
 
@@ -39,6 +40,16 @@ final class EloquentSeriesRepository implements SeriesRepository
             ->where('slug', $slug->value)
             ->when($except !== null, static fn ($q) => $q->whereKeyNot($except?->value))
             ->exists();
+    }
+
+    public function hasArticles(SeriesId $id): bool
+    {
+        return ArticleModel::withTrashed()->where('series_id', $id->value)->exists();
+    }
+
+    public function delete(SeriesId $id): void
+    {
+        SeriesModel::query()->whereKey($id->value)->delete();
     }
 
     /**

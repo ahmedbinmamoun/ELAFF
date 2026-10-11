@@ -16,4 +16,10 @@ interface CategoryRepository
     public function find(CategoryId $id): ?Category;
 
     public function slugExists(Slug $slug, ?CategoryId $except = null): bool;
+
+    public function hasArticles(CategoryId $id): bool;
+
+    public function hasChildren(CategoryId $id): bool;
+
+    public function delete(CategoryId $id): void;
 }

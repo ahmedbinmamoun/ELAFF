@@ -16,9 +16,11 @@ final class InMemorySeriesRepository implements SeriesRepository
     /** @var array<int, SeriesData> */
     private array $rows = [];
 
+    private int $lastId = 0;
+
     public function create(SeriesData $data): SeriesId
     {
-        $id = count($this->rows) + 1;
+        $id = ++$this->lastId;
         $this->rows[$id] = $data;
 
         return SeriesId::fromInt($id);
@@ -47,5 +49,26 @@ final class InMemorySeriesRepository implements SeriesRepository
         }
 
         return false;
+    }
+
+    /** @var array<int, true> */
+    private array $usedByArticles = [];
+
+    /**
+     * Test setup: pretend an article references this record.
+     */
+    public function markUsedByArticle(SeriesId $id): void
+    {
+        $this->usedByArticles[$id->value] = true;
+    }
+
+    public function hasArticles(SeriesId $id): bool
+    {
+        return isset($this->usedByArticles[$id->value]);
+    }
+
+    public function delete(SeriesId $id): void
+    {
+        unset($this->rows[$id->value]);
     }
 }
