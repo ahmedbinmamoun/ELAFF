@@ -19,4 +19,8 @@ interface AuthorRepository
     public function findByUser(UserId $userId): ?Author;
 
     public function slugExists(Slug $slug, ?AuthorId $except = null): bool;
+
+    public function hasArticles(AuthorId $id): bool;
+
+    public function delete(AuthorId $id): void;
 }

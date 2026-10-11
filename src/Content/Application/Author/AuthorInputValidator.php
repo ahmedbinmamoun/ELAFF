@@ -51,7 +51,7 @@ final readonly class AuthorInputValidator
         $linked = $this->authors->findByUser($id);
 
         if ($linked !== null && ($self === null || ! $linked->id->equals($self))) {
-            throw new InvalidInput('user_id', 'This user is already linked to another author.');
+            throw InvalidInput::because('user_id', 'user_already_linked', 'This user is already linked to another author.');
         }
 
         return $id;
@@ -69,7 +69,7 @@ final readonly class AuthorInputValidator
             $network = strtolower(trim($network));
 
             if (preg_match('/^[a-z0-9_-]{1,30}$/', $network) !== 1) {
-                throw new InvalidInput('social_links', sprintf('"%s" is not a valid network name.', $network));
+                throw InvalidInput::because('social_links', 'invalid_network', sprintf('"%s" is not a valid network name.', $network), ['network' => $network]);
             }
 
             $url = Fields::httpUrl('social_links', $url);

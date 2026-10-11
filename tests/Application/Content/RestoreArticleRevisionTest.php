@@ -50,3 +50,41 @@ it('fails on an unknown revision', function (): void {
     expect(fn () => $this->kit->make(RestoreArticleRevisionHandler::class)->handle(new RestoreArticleRevisionCommand(2, 999)))
         ->toThrow(RecordNotFound::class);
 });
+
+it('leaves out tags, authors and series deleted since the snapshot', function (): void {
+    $this->kit->grant(ContentPermission::EditAnyArticle);
+    $category = $this->kit->category('قسم ثابت');
+    $kept = $this->kit->author('باق');
+    $gone = $this->kit->author('محذوف');
+    $series = $this->kit->aSeries();
+    $id = $this->kit->make(CreateArticleDraftHandler::class)->handle(new CreateArticleDraftCommand(1, ArticleOrigin::Staff, $this->kit->input([
+        'title' => 'قديم', 'categoryId' => $category, 'authorIds' => [$kept, $gone], 'tagNames' => ['وسم'], 'seriesId' => $series, 'seriesPart' => 1,
+    ])));
+    $snapshot = $this->kit->revisions->forArticle($id)[0];
+    $this->kit->make(UpdateArticleHandler::class)->handle(new UpdateArticleCommand(1, $id->value, $this->kit->input([
+        'title' => 'جديد', 'categoryId' => $category, 'authorIds' => [$kept],
+    ])));
+
+    $this->kit->authors->delete(Elaf\Content\Domain\Author\AuthorId::fromInt($gone));
+    $this->kit->series->delete(Elaf\Content\Domain\Series\SeriesId::fromInt($series));
+    foreach ($snapshot->content->tagIds as $tag) {
+        $this->kit->tags->delete($tag);
+    }
+
+    $this->kit->make(RestoreArticleRevisionHandler::class)->handle(new RestoreArticleRevisionCommand(2, $snapshot->id));
+    $content = $this->kit->articles->get($id)->content();
+
+    expect($content->title->value)->toBe('قديم')
+        ->and(array_map(static fn ($a): int => $a->value, $content->authorIds))->toBe([$kept])
+        ->and($content->tagIds)->toBe([])
+        ->and($content->series)->toBeNull();
+});
+
+it('refuses to restore a snapshot whose category was deleted', function (): void {
+    $this->kit->grant(ContentPermission::EditAnyArticle);
+    $first = $this->kit->revisions->forArticle($this->id)[1];
+    $this->kit->categories->delete($first->content->categoryId);
+
+    expect(fn () => $this->kit->make(RestoreArticleRevisionHandler::class)->handle(new RestoreArticleRevisionCommand(2, $first->id)))
+        ->toThrow(Elaf\Shared\Application\Validation\InvalidInput::class);
+});

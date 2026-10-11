@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Elaf\Content\Infrastructure\Persistence\Models;
 
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Activitylog\Models\Activity;
 
 /**
  * Persistence shape of the Article aggregate. Written only by
@@ -55,6 +59,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonImmutable $updated_at
  * @property-read Collection<int, AuthorModel> $authors
  * @property-read Collection<int, TagModel> $tags
+ * @property-read User|null $writer
  */
 final class ArticleModel extends Model
 {
@@ -92,6 +97,32 @@ final class ArticleModel extends Model
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(TagModel::class, 'article_tag', 'article_id', 'tag_id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function writer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * @return HasMany<ArticleRevisionModel, $this>
+     */
+    public function revisions(): HasMany
+    {
+        return $this->hasMany(ArticleRevisionModel::class, 'article_id');
+    }
+
+    /**
+     * Audit log entries (FR-ART-08).
+     *
+     * @return MorphMany<Activity, $this>
+     */
+    public function activities(): MorphMany
+    {
+        return $this->morphMany(Activity::class, 'subject');
     }
 
     protected function casts(): array

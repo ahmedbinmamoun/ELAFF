@@ -6,6 +6,7 @@ namespace Elaf\Content\Application\Article;
 
 use Elaf\Content\Application\ContentPermission;
 use Elaf\Content\Domain\Article\Article;
+use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Shared\Application\Authorization\Authorizer;
 use Elaf\Shared\Application\Authorization\NotAuthorized;
@@ -13,6 +14,9 @@ use Elaf\Shared\Application\Authorization\NotAuthorized;
 /**
  * Who may act on an article (PRD §2, §2.1). Writers and contributors work on
  * their own articles only, and only until they submit them.
+ *
+ * The can*() questions take plain values so read-side callers (admin
+ * policies) ask the same rule without loading the aggregate.
  */
 final readonly class ArticleAccess
 {
@@ -25,27 +29,34 @@ final readonly class ArticleAccess
         }
     }
 
-    public function requireCanEdit(Article $article, UserId $actor): void
+    public function canEdit(UserId $actor, UserId $writer, ArticleStatus $status): bool
     {
-        if ($this->authorizer->allows(ContentPermission::EditAnyArticle->value)) {
-            return;
-        }
-
-        if (! $article->isCreatedBy($actor)) {
-            throw NotAuthorized::because('Only editors can edit articles written by someone else.');
-        }
-
-        if (! $article->status()->isEditableByAuthor()) {
-            throw NotAuthorized::because(sprintf('The article is locked while "%s".', $article->status()->value));
-        }
+        return $this->authorizer->allows(ContentPermission::EditAnyArticle->value)
+            || ($actor->equals($writer) && $status->isEditableByAuthor());
     }
 
     /**
      * Submitting or withdrawing: the article's own writer, or an editor.
      */
+    public function canSubmit(UserId $actor, UserId $writer): bool
+    {
+        return $actor->equals($writer) || $this->authorizer->allows(ContentPermission::EditAnyArticle->value);
+    }
+
+    public function requireCanEdit(Article $article, UserId $actor): void
+    {
+        if ($this->canEdit($actor, $article->createdBy(), $article->status())) {
+            return;
+        }
+
+        throw $article->isCreatedBy($actor)
+            ? NotAuthorized::because(sprintf('The article is locked while "%s".', $article->status()->value))
+            : NotAuthorized::because('Only editors can edit articles written by someone else.');
+    }
+
     public function requireOwnerOrEditor(Article $article, UserId $actor): void
     {
-        if (! $article->isCreatedBy($actor) && ! $this->authorizer->allows(ContentPermission::EditAnyArticle->value)) {
+        if (! $this->canSubmit($actor, $article->createdBy())) {
             throw NotAuthorized::because('Only the writer or an editor can do this.');
         }
     }

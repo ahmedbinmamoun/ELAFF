@@ -87,7 +87,7 @@ final readonly class ArticleContentFactory
         }
 
         if ($origin === ArticleOrigin::Contributor && ! $category->data->isOpenToContributors) {
-            throw new InvalidInput('category_id', 'This category is not open to contributors.');
+            throw InvalidInput::because('category_id', 'category_closed_to_contributors', 'This category is not open to contributors.');
         }
 
         return $category->id;
@@ -132,7 +132,7 @@ final readonly class ArticleContentFactory
         }
 
         if ($part === null || $part < 1) {
-            throw new InvalidInput('series_part', 'A series article needs a part number of 1 or more.');
+            throw InvalidInput::because('series_part', 'series_part_required', 'A series article needs a part number of 1 or more.');
         }
 
         return new SeriesPlacement(SeriesId::fromInt($seriesId), $part);

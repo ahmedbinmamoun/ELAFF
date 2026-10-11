@@ -16,4 +16,8 @@ interface SeriesRepository
     public function find(SeriesId $id): ?Series;
 
     public function slugExists(Slug $slug, ?SeriesId $except = null): bool;
+
+    public function hasArticles(SeriesId $id): bool;
+
+    public function delete(SeriesId $id): void;
 }

@@ -15,9 +15,11 @@ final class InMemoryTagRepository implements TagQueries, TagRepository
     /** @var array<int, Tag> */
     private array $tags = [];
 
+    private int $lastId = 0;
+
     public function create(string $name, Slug $slug): TagId
     {
-        $id = TagId::fromInt(count($this->tags) + 1);
+        $id = TagId::fromInt(++$this->lastId);
         $this->tags[$id->value] = new Tag($id, $name, $slug);
 
         return $id;
@@ -37,6 +39,16 @@ final class InMemoryTagRepository implements TagQueries, TagRepository
         }
 
         return null;
+    }
+
+    public function rename(TagId $id, string $name, Slug $slug): void
+    {
+        $this->tags[$id->value] = new Tag($id, $name, $slug);
+    }
+
+    public function delete(TagId $id): void
+    {
+        unset($this->tags[$id->value]);
     }
 
     public function suggest(string $prefix, int $limit = 10): array

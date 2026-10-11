@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Elaf\Content\Infrastructure\Persistence\Models;
 
+use App\Models\User;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -21,6 +23,14 @@ final class ArticleRevisionModel extends Model
     protected $table = 'article_revisions';
 
     protected $guarded = [];
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 
     protected function casts(): array
     {

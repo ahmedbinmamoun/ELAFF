@@ -6,6 +6,7 @@ namespace Elaf\Content\Infrastructure\Persistence\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -31,6 +32,14 @@ final class CategoryModel extends Model
     public function parent(): BelongsTo
     {
         return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * @return HasMany<ArticleModel, $this>
+     */
+    public function articles(): HasMany
+    {
+        return $this->hasMany(ArticleModel::class, 'category_id');
     }
 
     protected function casts(): array

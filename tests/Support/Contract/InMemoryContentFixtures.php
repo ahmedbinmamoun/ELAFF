@@ -9,6 +9,7 @@ use Elaf\Content\Domain\Category\CategoryId;
 use Elaf\Content\Domain\Series\SeriesId;
 use Elaf\Content\Domain\Tag\TagId;
 use Elaf\Identity\Domain\UserId;
+use LogicException;
 
 final class InMemoryContentFixtures implements ContentFixtures
 {
@@ -37,5 +38,14 @@ final class InMemoryContentFixtures implements ContentFixtures
     public function series(): SeriesId
     {
         return SeriesId::fromInt(++$this->next);
+    }
+
+    public function useInArticle(object $repository, CategoryId|AuthorId|SeriesId $id): void
+    {
+        if (! method_exists($repository, 'markUsedByArticle')) {
+            throw new LogicException($repository::class.' cannot be marked as used.');
+        }
+
+        $repository->markUsedByArticle($id);
     }
 }

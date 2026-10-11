@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elaf\Content\Infrastructure\Persistence\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -17,4 +18,12 @@ final class SeriesModel extends Model
     protected $table = 'series';
 
     protected $guarded = [];
+
+    /**
+     * @return HasMany<ArticleModel, $this>
+     */
+    public function articles(): HasMany
+    {
+        return $this->hasMany(ArticleModel::class, 'series_id');
+    }
 }

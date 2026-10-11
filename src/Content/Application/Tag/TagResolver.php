@@ -37,7 +37,7 @@ final readonly class TagResolver
         }
 
         if (count($ids) > self::MAX_TAGS) {
-            throw new InvalidInput('tags', sprintf('An article can have at most %d tags.', self::MAX_TAGS));
+            throw InvalidInput::because('tags', 'too_many_tags', sprintf('An article can have at most %d tags.', self::MAX_TAGS), ['max' => self::MAX_TAGS]);
         }
 
         return array_values($ids);

@@ -8,6 +8,7 @@ use Elaf\Content\Application\Category\Category;
 use Elaf\Content\Application\Category\CategoryData;
 use Elaf\Content\Application\Category\CategoryRepository;
 use Elaf\Content\Domain\Category\CategoryId;
+use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
 use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Shared\Domain\Text\Slug;
 
@@ -48,6 +49,21 @@ final class EloquentCategoryRepository implements CategoryRepository
             ->where('slug', $slug->value)
             ->when($except !== null, static fn ($q) => $q->whereKeyNot($except?->value))
             ->exists();
+    }
+
+    public function hasArticles(CategoryId $id): bool
+    {
+        return ArticleModel::withTrashed()->where('category_id', $id->value)->exists();
+    }
+
+    public function hasChildren(CategoryId $id): bool
+    {
+        return CategoryModel::query()->where('parent_id', $id->value)->exists();
+    }
+
+    public function delete(CategoryId $id): void
+    {
+        CategoryModel::query()->whereKey($id->value)->delete();
     }
 
     /**

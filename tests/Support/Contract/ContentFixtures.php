@@ -25,4 +25,10 @@ interface ContentFixtures
     public function tag(): TagId;
 
     public function series(): SeriesId;
+
+    /**
+     * Makes an article reference $id, for "in use" checks. $repository is
+     * the repository under test (the in-memory one keeps its own flags).
+     */
+    public function useInArticle(object $repository, CategoryId|AuthorId|SeriesId $id): void;
 }

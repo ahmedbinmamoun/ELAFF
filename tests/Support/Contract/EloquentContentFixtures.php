@@ -14,6 +14,7 @@ use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Content\Infrastructure\Persistence\Models\SeriesModel;
 use Elaf\Content\Infrastructure\Persistence\Models\TagModel;
 use Elaf\Identity\Domain\UserId;
+use Illuminate\Support\Facades\DB;
 
 final class EloquentContentFixtures implements ContentFixtures
 {
@@ -43,6 +44,33 @@ final class EloquentContentFixtures implements ContentFixtures
         $n = ++$this->next;
 
         return TagId::fromInt(TagModel::query()->create(['name' => "وسم {$n}", 'slug' => "tag-{$n}"])->id);
+    }
+
+    public function useInArticle(object $repository, CategoryId|AuthorId|SeriesId $id): void
+    {
+        $articleId = (int) DB::table('article_id_sequence')->insertGetId([]);
+        $user = $this->user()->value;
+
+        DB::table('articles')->insert([
+            'id' => $articleId,
+            'origin' => 'staff',
+            'category_id' => $id instanceof CategoryId ? $id->value : $this->category()->value,
+            'series_id' => $id instanceof SeriesId ? $id->value : null,
+            'series_part' => $id instanceof SeriesId ? 1 : null,
+            'title' => 'مقال',
+            'slug' => 'maqal',
+            'body' => '',
+            'source_name' => 'إيلاف',
+            'status' => 'draft',
+            'created_by' => $user,
+            'updated_by' => $user,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        if ($id instanceof AuthorId) {
+            DB::table('article_author')->insert(['article_id' => $articleId, 'author_id' => $id->value, 'position' => 0]);
+        }
     }
 
     public function series(): SeriesId

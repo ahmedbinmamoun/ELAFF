@@ -45,7 +45,7 @@ final class Fields
         $value = self::optional($field, $value, 2048);
 
         if ($value !== null && ! OptionalText::isHttpUrl($value)) {
-            throw new InvalidInput($field, sprintf('%s must be an http(s) URL.', $field));
+            throw InvalidInput::invalidUrl($field);
         }
 
         return $value;
@@ -61,7 +61,7 @@ final class Fields
         try {
             return $slug === null ? Slug::fromText($fallbackText) : Slug::fromString($slug);
         } catch (InvalidSlug $e) {
-            throw new InvalidInput($field, $e->getMessage());
+            throw InvalidInput::invalidSlug($field, $e->getMessage());
         }
     }
 }
