@@ -1,0 +1,92 @@
+# Production stack. Usage (see docs/runbooks/deploy.md):
+#   cp .env.example /srv/elaf/.env   # fill in real values, APP_ENV=production, APP_DEBUG=false
+#   ELAF_ENV_FILE=/srv/elaf/.env docker compose -f docker-compose.prod.yml --env-file /srv/elaf/.env up -d
+name: elaf
+
+x-php: &php
+  image: ${ELAF_IMAGE:-ghcr.io/elaf/newspaper}:${ELAF_TAG:-latest}
+  env_file: ${ELAF_ENV_FILE:-.env}
+  volumes:
+    - storage_data:/var/www/html/storage/app
+  depends_on:
+    mysql:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *php
+    environment:
+      RUN_MIGRATIONS: "true"
+    healthcheck:
+      test: ["CMD-SHELL", "php -r 'exit(@fsockopen(\"127.0.0.1\", 9000) ? 0 : 1);'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  queue:
+    <<: *php
+    command: php artisan queue:work --tries=3 --timeout=300 --max-time=3600
+    depends_on:
+      app:
+        condition: service_healthy
+
+  scheduler:
+    <<: *php
+    command: php artisan schedule:work
+    depends_on:
+      app:
+        condition: service_healthy
+
+  nginx:
+    image: ${ELAF_WEB_IMAGE:-ghcr.io/elaf/newspaper-web}:${ELAF_TAG:-latest}
+    ports:
+      - "${APP_PORT:-80}:80"
+    volumes:
+      - storage_data:/var/www/html/storage/app:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    env_file: ${ELAF_ENV_FILE:-.env}
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
+  storage_data:

@@ -1,0 +1,103 @@
+# Development stack. Values are interpolated from .env (copied from .env.example by `make up`).
+name: elaf
+
+x-php: &php
+  build:
+    context: .
+    dockerfile: docker/php/Dockerfile
+    target: dev
+    args:
+      UID: ${UID:-1000}
+      GID: ${GID:-1000}
+  image: elaf-php-dev
+  volumes:
+    - .:/var/www/html
+  depends_on:
+    mysql:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *php
+
+  queue:
+    <<: *php
+    command: php artisan queue:work --tries=3 --timeout=300
+    depends_on:
+      app:
+        condition: service_started
+
+  scheduler:
+    <<: *php
+    command: php artisan schedule:work
+    depends_on:
+      app:
+        condition: service_started
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./public:/var/www/html/public:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-elaf}
+      MYSQL_USER: ${DB_USERNAME:-elaf}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root-secret}
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${FORWARD_DB_PORT:-33060}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "${FORWARD_MAILPIT_UI_PORT:-8025}:8025"
+    restart: unless-stopped
+
+  vite:
+    image: node:24-alpine
+    working_dir: /var/www/html
+    user: "${UID:-1000}:${GID:-1000}"
+    command: sh -c "npm ci --no-audit --no-fund && npm run dev"
+    environment:
+      HOME: /tmp
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - .:/var/www/html
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:

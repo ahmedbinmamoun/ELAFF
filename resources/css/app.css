@@ -1,0 +1,22 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../../src/**/*.php';
+
+/*
+ * Design tokens (PRD §10). Re-brand by editing this block only (ADR-0003).
+ * Fonts are self-hosted subsets added in Phase 6; system fallbacks until then.
+ */
+@theme {
+    --font-sans: 'Cairo', 'Segoe UI', Tahoma, system-ui, sans-serif;
+    --font-serif: 'Noto Naskh Arabic', 'Times New Roman', serif;
+
+    --color-brand: #0f3d4c;
+    --color-brand-dark: #0a2a35;
+    --color-accent: #c8102e;
+    --color-ink: #1a1a1a;
+    --color-muted: #5f6b70;
+    --color-paper: #ffffff;
+    --color-rule: #d9dee0;
+}

@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+# Pest test files are excluded: their fluent DSL ($this binding, higher-order
+# expectations) is not statically typeable. Test support code is analysed.
+parameters:
+    level: max
+    paths:
+        - app
+        - src
+        - database
+        - routes
+        - tests/Support
+        - tests/TestCase.php
+    tmpDir: storage/framework/cache/phpstan
