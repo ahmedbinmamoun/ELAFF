@@ -51,6 +51,29 @@ foreach (ELAF_MODULES as $module) {
         ->not->toUse(elaf_layer('Presentation'));
 }
 
+/*
+ * PRD §5.2: Presentation may read Eloquent models, but every write goes
+ * through a use case. So no write ports, and no Eloquent repositories.
+ */
+const WRITE_PORTS = [
+    'Elaf\Content\Domain\Article\ArticleRepository',
+    'Elaf\Content\Application\Article\ArticleUnitOfWork',
+    'Elaf\Content\Application\Article\Revision\ArticleRevisions',
+    'Elaf\Content\Application\Category\CategoryRepository',
+    'Elaf\Content\Application\Tag\TagRepository',
+    'Elaf\Content\Application\Series\SeriesRepository',
+    'Elaf\Content\Application\Author\AuthorRepository',
+    'Elaf\Identity\Application\StaffUser\StaffUserRepository',
+    'Elaf\Content\Infrastructure\Persistence\Eloquent',
+    'Elaf\Identity\Infrastructure',
+];
+
+foreach (ELAF_MODULES as $module) {
+    arch("{$module}: presentation writes only through use cases")
+        ->expect("Elaf\\{$module}\\Presentation")
+        ->not->toUse(WRITE_PORTS);
+}
+
 arch('Elaf source declares strict types')
     ->expect('Elaf')
     ->toUseStrictTypes();
