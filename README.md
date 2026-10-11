@@ -29,6 +29,11 @@ Other targets: `make help`.
 - The scheduler publishes scheduled articles every minute
   (`php artisan articles:publish-scheduled`).
 
+## Frontend
+`make up` starts Vite with hot reload. To see production assets (e.g. for
+Lighthouse), run `docker compose exec vite npm run build`, stop the `vite`
+service and delete `public/hot`.
+
 ## Without Docker
 PHP 8.3 + Composer: `composer install && composer check` (tests use SQLite in memory).
 
