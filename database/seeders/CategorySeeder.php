@@ -9,36 +9,34 @@ use Elaf\Shared\Domain\Text\Slug;
 use Illuminate\Database\Seeder;
 
 /**
- * The paper's current sections (FR-TAX-01). Idempotent and non-destructive:
- * existing categories (matched by slug) are left as the editors changed them.
+ * The website's sections (FR-TAX-01, UI redesign). The printed paper's
+ * sections are kept per article in print_section (config/elaf.php).
+ * Idempotent and non-destructive: existing categories (matched by slug) keep
+ * the editors' changes.
  */
 final class CategorySeeder extends Seeder
 {
     /**
-     * Opinion sections are open to contributors by default (PRD §19 Q9 is
-     * still open; editors can change this in the admin).
+     * name, icon key, open to contributors (opinion sections; PRD §19 Q9 open).
      */
     public const SECTIONS = [
-        ['أخبار', false],
-        ['أخبار الأسبوع', false],
-        ['أسواق', false],
-        ['تقارير', false],
-        ['ما وراء الأخبار', false],
-        ['تحقيق', false],
-        ['حوار', false],
-        ['رأي اقتصادي', true],
-        ['رأي سياسي', true],
-        ['من صحافة العالم', false],
-        ['بريد القراء', false],
-        ['أخيرة', false],
+        ['أخبار السودان', 'map', false],
+        ['الاقتصاد', 'chart', false],
+        ['النفط والطاقة', 'flame', false],
+        ['السياسة', 'landmark', false],
+        ['العالم', 'globe', false],
+        ['تقارير وتحقيقات', 'document', false],
+        ['آراء وكتابات', 'pen', true],
+        ['مقالات', 'book', true],
+        ['منوعات', 'grid', false],
     ];
 
     public function run(): void
     {
-        foreach (self::SECTIONS as $order => [$name, $openToContributors]) {
+        foreach (self::SECTIONS as $order => [$name, $icon, $openToContributors]) {
             CategoryModel::query()->firstOrCreate(
                 ['slug' => Slug::fromText($name)->value],
-                ['name' => $name, 'sort_order' => ($order + 1) * 10, 'is_open_to_contributors' => $openToContributors],
+                ['name' => $name, 'icon' => $icon, 'sort_order' => ($order + 1) * 10, 'is_open_to_contributors' => $openToContributors],
             );
         }
     }

@@ -13,6 +13,7 @@ use Elaf\Content\Domain\Article\ArticleContent;
 use Elaf\Content\Domain\Article\ArticleOrigin;
 use Elaf\Content\Domain\Article\ArticleRepository;
 use Elaf\Content\Domain\Article\ArticleSource;
+use Elaf\Content\Domain\Article\FeaturedImage;
 use Elaf\Content\Domain\Article\SeriesPlacement;
 use Elaf\Content\Domain\Article\Title;
 use Elaf\Content\Domain\Author\AuthorId;
@@ -32,6 +33,7 @@ use Elaf\Shared\Application\Html\SanitizerProfile;
 use Elaf\Shared\Domain\Text\Slug;
 use Elaf\Shared\Domain\Time\Clock;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Local demo data: one user per role (password "password"), authors, tags, a
@@ -64,6 +66,7 @@ final class DemoContentSeeder extends Seeder
         $authors = $this->authors($users[Role::Writer->value]);
         $tags = $this->tags();
         $seriesId = $this->series();
+        $images = $this->placeholderImages(8);
         $categories = array_values(CategoryModel::query()->orderBy('sort_order')->get(['id'])->map(static fn (CategoryModel $c): int => $c->id)->all());
 
         $writer = UserId::fromInt($users[Role::Writer->value]->id);
@@ -78,7 +81,7 @@ final class DemoContentSeeder extends Seeder
                 $this->articles->nextId(),
                 ArticleOrigin::Staff,
                 $writer,
-                $this->content($this->text->pick($categories), $this->text->pick($authors), $tags, $series),
+                $this->content($this->text->pick($categories), $this->text->pick($authors), $tags, $series, $images[$i % 8] ?? null),
                 $this->clockAt($createdAt),
             );
             $later = $this->clockAt($createdAt->modify('+2 hours'));
@@ -191,7 +194,7 @@ final class DemoContentSeeder extends Seeder
     /**
      * @param  list<int>  $tags
      */
-    private function content(int $categoryId, int $authorId, array $tags, ?SeriesPlacement $series): ArticleContent
+    private function content(int $categoryId, int $authorId, array $tags, ?SeriesPlacement $series, ?string $image = null): ArticleContent
     {
         $title = $this->text->title();
         $tagIds = array_values(array_unique([$this->text->pick($tags), $this->text->pick($tags)]));
@@ -209,6 +212,7 @@ final class DemoContentSeeder extends Seeder
             dateline: $this->text->place(),
             excerpt: $this->text->sentence(12, 24),
             series: $series,
+            featuredImage: $image === null ? null : new FeaturedImage($image, $this->text->sentence(4, 8), 'إيلاف'),
         );
     }
 
@@ -242,6 +246,42 @@ final class DemoContentSeeder extends Seeder
         if ($featured) {
             $article->promote(true, 10, $chief, $clock);
         }
+    }
+
+    /**
+     * Abstract gradient pictures for demo articles (no real photos).
+     *
+     * @return list<string> paths on the public disk
+     */
+    private function placeholderImages(int $count): array
+    {
+        if (! function_exists('imagecreatetruecolor')) {
+            return [];
+        }
+
+        $palettes = [[14, 42, 71], [200, 16, 46], [28, 61, 99], [176, 112, 32], [35, 94, 78], [92, 56, 120], [60, 70, 82], [150, 60, 30]];
+        $paths = [];
+        Storage::disk('public')->makeDirectory('demo');
+
+        for ($i = 0; $i < $count; $i++) {
+            $image = imagecreatetruecolor(1280, 720);
+            [$r, $g, $b] = $palettes[$i % count($palettes)];
+
+            for ($y = 0; $y < 720; $y++) {
+                $f = $y / 720;
+                $shade = static fn (int $c): int => max(0, min(255, (int) ($c + (255 - $c) * $f * 0.6)));
+                $color = imagecolorallocate($image, $shade($r), $shade($g), $shade($b));
+                imageline($image, 0, $y, 1280, $y, (int) $color);
+            }
+
+            $path = "demo/placeholder-{$i}.jpg";
+            ob_start();
+            imagejpeg($image, null, 80);
+            Storage::disk('public')->put($path, (string) ob_get_clean());
+            $paths[] = $path;
+        }
+
+        return $paths;
     }
 
     private function clockAt(DateTimeImmutable $moment): Clock

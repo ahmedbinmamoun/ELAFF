@@ -101,7 +101,7 @@ final class AdminFixtures
             slug: Slug::fromText($title),
             body: ArticleBody::fromSanitizedHtml('<p>نص الكاتب الضيف</p>'),
             source: new ArticleSource('إيلاف'),
-            categoryId: CategoryId::fromInt(self::category('رأي اقتصادي')->id),
+            categoryId: CategoryId::fromInt(self::category('آراء وكتابات')->id),
             authorIds: [$author->id],
         ), $clock);
 

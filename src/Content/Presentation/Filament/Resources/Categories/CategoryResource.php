@@ -14,6 +14,7 @@ use Elaf\Content\Presentation\Filament\Resources\Categories\Pages\EditCategory;
 use Elaf\Content\Presentation\Filament\Resources\Categories\Pages\ListCategories;
 use Elaf\Shared\Presentation\Filament\FormData;
 use Elaf\Shared\Presentation\Filament\UseCaseDeleteAction;
+use Elaf\Shared\Presentation\Icons;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -75,6 +76,9 @@ final class CategoryResource extends Resource
                         ->all())
                     ->searchable(),
                 TextInput::make('sort_order')->label(self::label('sort_order'))->integer()->default(0),
+                Select::make('icon')
+                    ->label(self::label('icon'))
+                    ->options(Icons::SECTION_ICONS),
                 Textarea::make('description')->label(self::label('description'))->rows(3)->maxLength(1000)->columnSpanFull(),
                 Toggle::make('is_visible')->label(self::label('is_visible'))->default(true),
                 Toggle::make('is_open_to_contributors')->label(self::label('is_open_to_contributors')),
@@ -122,6 +126,7 @@ final class CategoryResource extends Resource
             isOpenToContributors: FormData::bool($data, 'is_open_to_contributors'),
             seoTitle: FormData::text($data, 'seo_title'),
             seoDescription: FormData::text($data, 'seo_description'),
+            icon: FormData::text($data, 'icon'),
         );
     }
 
