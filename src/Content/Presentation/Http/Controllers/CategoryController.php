@@ -22,6 +22,6 @@ final readonly class CategoryController
         $articles = $this->articles->byCategory($category->category->id, PublicPage::page($request), PublicPage::PER_PAGE);
         PublicPage::abortPastEnd($articles);
 
-        return view('content.category', ['category' => $category, 'articles' => $articles]);
+        return view('content.category', ['category' => $category, 'articles' => $articles, 'mostRead' => $this->articles->mostRead(PublicPage::MOST_READ)]);
     }
 }

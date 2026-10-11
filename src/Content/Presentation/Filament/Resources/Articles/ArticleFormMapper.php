@@ -43,6 +43,7 @@ final class ArticleFormMapper
             seoTitle: FormData::text($data, 'seo_title'),
             seoDescription: FormData::text($data, 'seo_description'),
             canonicalUrl: FormData::text($data, 'canonical_url'),
+            printSection: FormData::text($data, 'print_section'),
         );
     }
 
@@ -72,6 +73,7 @@ final class ArticleFormMapper
             'seo_title' => $article->seo_title,
             'seo_description' => $article->seo_description,
             'canonical_url' => $article->canonical_url,
+            'print_section' => $article->print_section,
         ];
     }
 }

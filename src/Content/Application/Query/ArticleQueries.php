@@ -63,6 +63,22 @@ interface ArticleQueries
     public function related(int $articleId, int $categoryId, int $limit): array;
 
     /**
+     * PRD §8 MostRead(period): by view count, then newest. Until view counting
+     * (FR-ART-09) fills the counter this is effectively "latest".
+     *
+     * @return list<ArticleCard>
+     */
+    public function mostRead(int $limit, ?DateTimeImmutable $since = null): array;
+
+    /**
+     * Published articles among $ids, in the order given (reader favorites).
+     *
+     * @param  list<int>  $ids
+     * @return list<ArticleCard>
+     */
+    public function cards(array $ids): array;
+
+    /**
      * FR-AUT-02: columnists with their latest published column.
      *
      * @return list<ColumnistItem>

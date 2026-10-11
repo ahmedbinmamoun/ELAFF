@@ -7,6 +7,8 @@ it('reports healthy on /up', function (): void {
 });
 
 it('serves the RTL Arabic home page', function (): void {
+    $this->artisan('migrate');
+
     $this->get('/')
         ->assertOk()
         ->assertSee('dir="rtl"', escape: false)

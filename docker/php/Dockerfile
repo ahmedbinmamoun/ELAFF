@@ -38,7 +38,7 @@ FROM node:${NODE_VERSION}-alpine AS assets
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
-COPY vite.config.js ./
+COPY vite.config.js tailwind.config.js ./
 COPY resources ./resources
 COPY src ./src
 RUN npm run build
@@ -54,7 +54,8 @@ COPY --chown=www-data:www-data . .
 COPY --chown=www-data:www-data --from=assets /app/public/build ./public/build
 RUN composer dump-autoload --optimize --classmap-authoritative --no-dev \
  && php artisan package:discover --ansi \
- && rm -rf tests docker/mysql node_modules .env \
+ && rm -rf tests docker/mysql node_modules .env public/storage \
+ && ln -s ../storage/app/public public/storage \
  && chown -R www-data:www-data storage bootstrap/cache
 
 COPY docker/php/entrypoint.prod.sh /usr/local/bin/elaf-entrypoint

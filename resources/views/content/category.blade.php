@@ -9,11 +9,10 @@
 @endpush
 
 @section('content')
-    <header class="mt-6 border-b-2 border-brand pb-3">
-        <h1 class="font-serif text-3xl font-bold text-brand">{{ $category->category->name }}</h1>
-        @if ($category->description)
-            <p class="mt-2 text-muted">{{ $category->description }}</p>
-        @endif
-    </header>
-    @include('content.partials.listing', ['articles' => $articles])
+    <x-page-header :title="$category->category->name" :icon="$category->category->icon">
+        @if ($category->description)<p class="mt-2 text-muted">{{ $category->description }}</p>@endif
+    </x-page-header>
+    <x-with-aside :most-read="$mostRead">
+        @include('content.partials.listing', ['articles' => $articles])
+    </x-with-aside>
 @endsection

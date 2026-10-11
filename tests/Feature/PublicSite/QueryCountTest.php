@@ -15,7 +15,8 @@ use Tests\Support\PublicFixtures;
 uses(RefreshDatabase::class);
 
 /*
- * Phase 3 acceptance: no N+1. Each key page runs a fixed number of queries,
+ * Phase 3 acceptance: no N+1. Every page also pays a fixed cost for the
+ * header (sections, breaking ticker) and, on listings, the "most read" aside. Each key page runs a fixed number of queries,
  * the same with twice as much content.
  */
 
@@ -49,6 +50,7 @@ beforeEach(function (): void {
     };
 
     $this->queries = function (string $path): int {
+        $this->app->forgetScopedInstances();
         DB::flushQueryLog();
         DB::enableQueryLog();
         $this->get($path)->assertOk();
@@ -64,7 +66,7 @@ it('runs a constant, small number of queries per page', function (string $page, 
     $paths = [
         'home' => '/',
         'article' => route('article.show', ['id' => $article, 'slug' => Elaf\Content\Infrastructure\Persistence\Models\ArticleModel::query()->findOrFail($article)->slug]),
-        'category' => '/category/أخبار',
+        'category' => '/category/أخبار-السودان',
         'author' => '/author/katib-1',
         'tag' => '/tag/wasm',
         'series' => '/series/silsila',
@@ -77,11 +79,11 @@ it('runs a constant, small number of queries per page', function (string $page, 
 
     expect($after)->toBe($before)->and($before)->toBeLessThanOrEqual($max);
 })->with([
-    'home' => ['home', 12],
-    'article' => ['article', 8],
-    'category' => ['category', 6],
-    'author' => ['author', 6],
-    'tag' => ['tag', 6],
+    'home' => ['home', 16],
+    'article' => ['article', 12],
+    'category' => ['category', 9],
+    'author' => ['author', 9],
+    'tag' => ['tag', 9],
     'series' => ['series', 5],
     'feed' => ['feed', 4],
 ]);

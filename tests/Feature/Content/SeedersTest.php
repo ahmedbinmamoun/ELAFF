@@ -33,16 +33,17 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
     'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers]],
 ]);
 
-it('seeds the paper\'s twelve sections once, without overwriting edits (FR-TAX-01)', function (): void {
+it('seeds the website sections with icons once, without overwriting edits (FR-TAX-01)', function (): void {
     $this->seed(CategorySeeder::class);
-    CategoryModel::query()->where('slug', 'أسواق')->update(['name' => 'الأسواق المالية']);
+    CategoryModel::query()->where('slug', 'الاقتصاد')->update(['name' => 'اقتصاد وأعمال']);
     $this->seed([CategorySeeder::class, RolesAndPermissionsSeeder::class, RolesAndPermissionsSeeder::class]);
 
     expect(CategoryModel::query()->orderBy('sort_order')->pluck('slug')->all())->toBe([
-        'أخبار', 'أخبار-الأسبوع', 'أسواق', 'تقارير', 'ما-وراء-الأخبار', 'تحقيق', 'حوار', 'رأي-اقتصادي', 'رأي-سياسي', 'من-صحافة-العالم', 'بريد-القراء', 'أخيرة',
+        'أخبار-السودان', 'الاقتصاد', 'النفط-والطاقة', 'السياسة', 'العالم', 'تقارير-وتحقيقات', 'آراء-وكتابات', 'مقالات', 'منوعات',
     ])
-        ->and(CategoryModel::query()->where('slug', 'أسواق')->value('name'))->toBe('الأسواق المالية')
-        ->and(CategoryModel::query()->where('is_open_to_contributors', true)->pluck('slug')->all())->toBe(['رأي-اقتصادي', 'رأي-سياسي'])
+        ->and(CategoryModel::query()->where('slug', 'الاقتصاد')->value('name'))->toBe('اقتصاد وأعمال')
+        ->and(CategoryModel::query()->whereNull('icon')->count())->toBe(0)
+        ->and(CategoryModel::query()->where('is_open_to_contributors', true)->pluck('slug')->all())->toBe(['آراء-وكتابات', 'مقالات'])
         ->and(DB::table('roles')->count())->toBe(count(Role::cases()));
 });
 

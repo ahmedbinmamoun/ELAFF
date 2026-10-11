@@ -40,6 +40,7 @@ final class EloquentCategoryRepository implements CategoryRepository
             isOpenToContributors: $model->is_open_to_contributors,
             seoTitle: $model->seo_title,
             seoDescription: $model->seo_description,
+            icon: $model->icon,
         ));
     }
 
@@ -81,6 +82,7 @@ final class EloquentCategoryRepository implements CategoryRepository
             'is_open_to_contributors' => $data->isOpenToContributors,
             'seo_title' => $data->seoTitle,
             'seo_description' => $data->seoDescription,
+            'icon' => $data->icon,
         ];
     }
 }

@@ -35,6 +35,7 @@ final readonly class ArticleInput
         public ?string $seoTitle = null,
         public ?string $seoDescription = null,
         public ?string $canonicalUrl = null,
+        public ?string $printSection = null,
     ) {}
 
     /**
@@ -47,6 +48,7 @@ final readonly class ArticleInput
             $this->slug, $this->kicker, $this->subtitle, $this->dateline, $this->excerpt, $this->sourceUrl,
             $this->featuredImagePath, $this->featuredImageCaption, $this->featuredImageCredit,
             $this->seriesId, $this->seriesPart, $this->seoTitle, $this->seoDescription, $this->canonicalUrl,
+            $this->printSection,
         );
     }
 }

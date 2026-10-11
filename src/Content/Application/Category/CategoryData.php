@@ -22,5 +22,6 @@ final readonly class CategoryData
         public bool $isOpenToContributors = false,
         public ?string $seoTitle = null,
         public ?string $seoDescription = null,
+        public ?string $icon = null,
     ) {}
 }

@@ -22,6 +22,6 @@ final readonly class TagController
         $articles = $this->articles->byTag($tag->slug, PublicPage::page($request), PublicPage::PER_PAGE);
         PublicPage::abortPastEnd($articles);
 
-        return view('content.tag', ['tag' => $tag, 'articles' => $articles]);
+        return view('content.tag', ['tag' => $tag, 'articles' => $articles, 'mostRead' => $this->articles->mostRead(PublicPage::MOST_READ)]);
     }
 }

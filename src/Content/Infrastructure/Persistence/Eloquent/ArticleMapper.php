@@ -48,6 +48,7 @@ final class ArticleMapper
             seoTitle: $model->seo_title,
             seoDescription: $model->seo_description,
             canonicalUrl: $model->canonical_url,
+            printSection: $model->print_section,
         );
 
         return Article::reconstitute(
@@ -111,6 +112,7 @@ final class ArticleMapper
             'seo_title' => $content->seoTitle,
             'seo_description' => $content->seoDescription,
             'canonical_url' => $content->canonicalUrl,
+            'print_section' => $content->printSection,
             'created_by' => $article->createdBy()->value,
             'updated_by' => $article->updatedBy()->value,
             'reviewed_by' => $article->reviewedBy()?->value,

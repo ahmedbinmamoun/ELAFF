@@ -16,11 +16,19 @@ use Tests\Support\PublicFixtures;
 
 uses(RefreshDatabase::class);
 
+/**
+ * The page without its "most read" aside, which may list any article.
+ */
+function main_column(string $html): string
+{
+    return explode('aria-labelledby="most-read-title"', $html)[0];
+}
+
 beforeEach(function (): void {
     $this->seed([Database\Seeders\RolesAndPermissionsSeeder::class, CategorySeeder::class]);
     $this->fx = new PublicFixtures;
-    $this->news = CategoryModel::query()->where('slug', 'أخبار')->sole();
-    $this->markets = CategoryModel::query()->where('slug', 'أسواق')->sole();
+    $this->news = CategoryModel::query()->where('slug', 'أخبار-السودان')->sole();
+    $this->markets = CategoryModel::query()->where('slug', 'الاقتصاد')->sole();
     $this->columnist = AuthorModel::query()->create(['name' => 'آمنة الطيب', 'slug' => 'آمنة-الطيب', 'is_columnist' => true, 'title' => 'كاتبة عمود']);
     $this->reporter = AuthorModel::query()->create(['name' => 'محمد عثمان', 'slug' => 'محمد-عثمان']);
 });
@@ -37,7 +45,7 @@ it('renders the homepage: breaking ticker, hero, latest, columnists and sections
         ->assertSee('dir="rtl"', false)
         ->assertSeeInOrder([__('public.breaking'), 'خبر عاجل مهم', 'القصة الرئيسية', __('public.columnists'), 'آمنة الطيب', 'عمود الأسبوع'])
         ->assertSee('fetchpriority="high"', false)
-        ->assertSee(route('category.show', 'أسواق'), false)
+        ->assertSee(route('category.show', 'الاقتصاد'), false)
         ->assertDontSee('مسودة لم تنشر');
 });
 
@@ -103,13 +111,13 @@ it('lists a category newest first, paginated, and 404s hidden categories and pag
     }
     $this->fx->published('خبر في قسم آخر', $this->markets->id, [$this->reporter->id]);
 
-    $this->get('/category/أخبار')->assertOk()->assertSeeInOrder(['خبر رقم 22', 'خبر رقم 3'])->assertDontSee('خبر رقم 2<', false)
-        ->assertDontSee('خبر في قسم آخر')->assertSee(__('public.page_of', ['page' => 1, 'last' => 2]));
-    $this->get('/category/أخبار?page=2')->assertOk()->assertSee('خبر رقم 1')->assertSee('rel="prev"', false);
-    $this->get('/category/أخبار?page=3')->assertNotFound();
+    $first = $this->get('/category/أخبار-السودان')->assertOk()->assertSee(__('public.page_of', ['page' => 1, 'last' => 2]));
+    expect(main_column($first->getContent()))->toContain('خبر رقم 22', 'خبر رقم 3')->not->toContain('خبر رقم 2<', 'خبر في قسم آخر');
+    $this->get('/category/أخبار-السودان?page=2')->assertOk()->assertSee('خبر رقم 1')->assertSee('rel="prev"', false);
+    $this->get('/category/أخبار-السودان?page=3')->assertNotFound();
 
     $this->news->update(['is_visible' => false]);
-    $this->get('/category/أخبار')->assertNotFound();
+    $this->get('/category/أخبار-السودان')->assertNotFound();
 });
 
 it('shows author pages, the columnists index, tag pages and series pages (FR-AUT-02, FR-TAX-02/03)', function (): void {
@@ -119,9 +127,11 @@ it('shows author pages, the columnists index, tag pages and series pages (FR-AUT
     $this->fx->published('عمود ثان', $this->markets->id, [$this->columnist->id], series: [$series->id, 1]);
     $this->fx->published('خبر عادي', $this->news->id, [$this->reporter->id]);
 
-    $this->get('/author/آمنة-الطيب')->assertOk()->assertSee('كاتبة عمود')->assertSeeInOrder(['عمود ثان', 'عمود أول'])->assertDontSee('خبر عادي');
+    $author = $this->get('/author/آمنة-الطيب')->assertOk()->assertSee('كاتبة عمود')->assertSeeInOrder(['عمود ثان', 'عمود أول']);
+    expect(main_column($author->getContent()))->not->toContain('خبر عادي');
     $this->get('/authors')->assertOk()->assertSee('آمنة الطيب')->assertSee('عمود ثان')->assertDontSee('محمد عثمان');
-    $this->get('/tag/الدولار')->assertOk()->assertSee('عمود أول')->assertDontSee('عمود ثان');
+    $tag = $this->get('/tag/الدولار')->assertOk()->assertSee('عمود أول');
+    expect(main_column($tag->getContent()))->not->toContain('عمود ثان');
     $this->get('/series/سلسلة')->assertOk()->assertSee('وصف السلسلة')->assertSeeInOrder(['عمود ثان', 'عمود أول']);
 
     $this->get('/author/لا-أحد')->assertNotFound();
@@ -139,7 +149,7 @@ it('publishes valid RSS 2.0 feeds, site-wide and per category (FR-SEO-03)', func
         ->and(count($xml->channel->item))->toBe(2)
         ->and((string) $xml->channel->item[0]->title)->toBe('سوق للخلاصة');
 
-    $category = simplexml_load_string($this->get('/feed/أسواق')->assertOk()->getContent());
+    $category = simplexml_load_string($this->get('/feed/الاقتصاد')->assertOk()->getContent());
     expect(count($category->channel->item))->toBe(1);
 
     $this->get('/feed/لا-شيء')->assertNotFound();
@@ -149,4 +159,4 @@ it('is right-to-left with Arabic dates on every public page', function (string $
     $this->fx->published('مقال', $this->news->id, [$this->columnist->id]);
 
     $this->get($path)->assertOk()->assertSee('<html lang="ar" dir="rtl">', false)->assertSee('مارس 2026');
-})->with(['/', '/category/أخبار', '/author/آمنة-الطيب', '/authors']);
+})->with(['/', '/category/أخبار-السودان', '/author/آمنة-الطيب', '/authors']);

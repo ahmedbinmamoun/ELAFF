@@ -79,6 +79,7 @@ final readonly class RestoreArticleRevisionHandler
             seoTitle: $c->seoTitle,
             seoDescription: $c->seoDescription,
             canonicalUrl: $c->canonicalUrl,
+            printSection: $c->printSection,
         );
     }
 }

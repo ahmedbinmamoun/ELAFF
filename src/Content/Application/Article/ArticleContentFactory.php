@@ -67,6 +67,7 @@ final readonly class ArticleContentFactory
             seoTitle: Fields::optional('seo_title', $input->seoTitle, 255),
             seoDescription: Fields::optional('seo_description', $input->seoDescription, 500),
             canonicalUrl: Fields::httpUrl('canonical_url', $input->canonicalUrl),
+            printSection: Fields::optional('print_section', $input->printSection, 60),
         );
     }
 

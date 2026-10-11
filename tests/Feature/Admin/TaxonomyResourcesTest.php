@@ -43,12 +43,12 @@ it('creates and edits categories through the use cases (FR-TAX-01)', function ()
     expect($category->is_open_to_contributors)->toBeTrue();
 
     Livewire::test(EditCategory::class, ['record' => $category->getRouteKey()])
-        ->fillForm(['slug' => 'أسواق'])
+        ->fillForm(['slug' => 'الاقتصاد'])
         ->call('save')
         ->assertHasFormErrors(['slug']);
 
     Livewire::test(EditCategory::class, ['record' => $category->getRouteKey()])
-        ->fillForm(['parent_id' => CategoryModel::query()->where('slug', 'أخبار')->value('id')])
+        ->fillForm(['parent_id' => CategoryModel::query()->where('slug', 'أخبار-السودان')->value('id')])
         ->call('save')
         ->assertHasNoFormErrors();
     expect($category->refresh()->parent_id)->not->toBeNull();
@@ -56,7 +56,7 @@ it('creates and edits categories through the use cases (FR-TAX-01)', function ()
 
 it('refuses to delete a category that still has articles', function (): void {
     $used = AdminFixtures::article(ArticleStatus::Draft, AdminFixtures::user(Role::Writer))->category;
-    $empty = CategoryModel::query()->where('slug', 'أخيرة')->sole();
+    $empty = CategoryModel::query()->where('slug', 'منوعات')->sole();
 
     Livewire::test(ListCategories::class)
         ->callAction(TestAction::make('delete')->table($used))

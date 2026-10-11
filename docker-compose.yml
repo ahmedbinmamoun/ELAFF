@@ -43,6 +43,8 @@ services:
       - "${APP_PORT:-8080}:80"
     volumes:
       - ./public:/var/www/html/public:ro
+      # Uploads behind the public/storage symlink (featured images, photos).
+      - ./storage/app/public:/var/www/html/storage/app/public:ro
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
       - app

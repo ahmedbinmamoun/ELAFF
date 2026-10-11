@@ -71,6 +71,18 @@ final class ArticleForm
                         ->helperText(__('admin.article.hints.tags'))
                         ->suggestions(static fn (): array => TagModel::query()->orderBy('name')->limit(500)->pluck('name')->all()),
                 ]),
+                Section::make(__('admin.article.sections.print'))->collapsed()->schema([
+                    Select::make('print_section')
+                        ->label(self::label('print_section'))
+                        ->options(static function (): array {
+                            $sections = config('elaf.print_sections');
+
+                            $names = is_array($sections) ? array_values(array_filter($sections, is_string(...))) : [];
+
+                            return array_combine($names, $names);
+                        })
+                        ->searchable(),
+                ]),
                 Section::make(__('admin.article.sections.source'))->schema([
                     TextInput::make('source_name')->label(self::label('source_name'))->required()->maxLength(120)->default('إيلاف'),
                     TextInput::make('source_url')->label(self::label('source_url'))->url()->maxLength(2048),

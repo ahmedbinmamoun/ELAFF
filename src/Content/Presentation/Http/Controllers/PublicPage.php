@@ -14,6 +14,8 @@ final class PublicPage
 {
     public const PER_PAGE = 20;
 
+    public const MOST_READ = 5;
+
     public static function page(Request $request): int
     {
         $page = $request->query('page');
