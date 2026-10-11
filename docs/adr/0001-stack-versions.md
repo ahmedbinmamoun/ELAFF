@@ -21,13 +21,15 @@ Versions resolved by Composer/npm at project creation:
 | Node (assets) | 24 |
 | Vite / Tailwind CSS | 8 / 4 |
 | nginx | 1.27 |
+| Spatie Laravel Permission | 8.3.0 (Phase 1) |
+| Spatie Laravel Activitylog | 4.12.3 (Phase 1) |
+| HTMLPurifier (`ezyang/htmlpurifier`) | 4.19.1 (Phase 1, see ADR-0004) |
 
 Build-time tooling (not runtime dependencies): `mlocati/php-extension-installer`
 to compile PHP extensions in the image, and `axllent/mailpit` (dev only).
 
-Filament, Spatie Permission/Activitylog/Backup/Media Library, HTMLPurifier
-are installed in the phase that first uses them (Phase 1/2), pinned then and
-added to this table.
+Filament and Spatie Backup/Media Library are installed in the phase that
+first uses them, pinned then and added to this table.
 
 ## Consequences
 - Pest test files are excluded from PHPStan (their fluent DSL is not
