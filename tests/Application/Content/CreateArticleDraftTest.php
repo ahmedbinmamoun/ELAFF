@@ -68,6 +68,7 @@ it('sanitizes the body on save (FR-ART-03)', function (): void {
 
 it('uses the strict profile for contributors', function (): void {
     $category = $this->kit->category('رأي', openToContributors: true);
+    $this->kit->authors->create(new Elaf\Content\Application\Author\AuthorData('ضيف', Elaf\Shared\Domain\Text\Slug::fromText('ضيف'), userId: Elaf\Identity\Domain\UserId::fromInt(1)));
     $id = ($this->create)([
         'categoryId' => $category,
         'body' => '<p class="x"><a href="https://example.com" target="_blank">رابط</a></p>',
@@ -79,6 +80,7 @@ it('uses the strict profile for contributors', function (): void {
 
 it('only lets contributors use categories open to them (FR-CON-06)', function (): void {
     $closed = $this->kit->category('أخبار');
+    $this->kit->authors->create(new Elaf\Content\Application\Author\AuthorData('ضيف', Elaf\Shared\Domain\Text\Slug::fromText('ضيف'), userId: Elaf\Identity\Domain\UserId::fromInt(1)));
 
     expect(fn () => ($this->create)(['categoryId' => $closed], ArticleOrigin::Contributor))
         ->toThrow(InvalidInput::class, 'not open to contributors');

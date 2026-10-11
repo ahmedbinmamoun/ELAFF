@@ -6,6 +6,7 @@ namespace Elaf\Content\Infrastructure\Persistence\Eloquent;
 
 use Carbon\CarbonImmutable;
 use DateTimeImmutable;
+use Elaf\Content\Application\Article\ArticleCounts;
 use Elaf\Content\Application\Article\DueScheduledArticles;
 use Elaf\Content\Domain\Article\Article;
 use Elaf\Content\Domain\Article\ArticleId;
@@ -14,9 +15,10 @@ use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Content\Domain\Article\Exception\ArticleNotFound;
 use Elaf\Content\Domain\Tag\TagId;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
+use Elaf\Identity\Domain\UserId;
 use Illuminate\Database\ConnectionInterface;
 
-final readonly class EloquentArticleRepository implements ArticleRepository, DueScheduledArticles
+final readonly class EloquentArticleRepository implements ArticleCounts, ArticleRepository, DueScheduledArticles
 {
     public function __construct(
         private ConnectionInterface $db,
@@ -67,6 +69,25 @@ final readonly class EloquentArticleRepository implements ArticleRepository, Due
             ->where('status', ArticleStatus::Scheduled->value)
             ->where('scheduled_for', '<=', LocalTime::format($now))
             ->orderBy('scheduled_for')
+            ->orderBy('id')
+            ->get(['id'])
+            ->map(static fn (ArticleModel $model): ArticleId => ArticleId::fromInt($model->id))
+            ->all());
+    }
+
+    public function inReviewBy(UserId $writer): int
+    {
+        return ArticleModel::query()
+            ->where('created_by', $writer->value)
+            ->where('status', ArticleStatus::InReview->value)
+            ->count();
+    }
+
+    public function publishedBy(UserId $writer): array
+    {
+        return array_values(ArticleModel::query()
+            ->where('created_by', $writer->value)
+            ->where('status', ArticleStatus::Published->value)
             ->orderBy('id')
             ->get(['id'])
             ->map(static fn (ArticleModel $model): ArticleId => ArticleId::fromInt($model->id))

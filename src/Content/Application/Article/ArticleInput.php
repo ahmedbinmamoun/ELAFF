@@ -36,4 +36,17 @@ final readonly class ArticleInput
         public ?string $seoDescription = null,
         public ?string $canonicalUrl = null,
     ) {}
+
+    /**
+     * @param  list<int>  $authorIds
+     */
+    public function withAuthorIds(array $authorIds): self
+    {
+        return new self(
+            $this->title, $this->body, $this->sourceName, $this->categoryId, $authorIds, $this->tagNames,
+            $this->slug, $this->kicker, $this->subtitle, $this->dateline, $this->excerpt, $this->sourceUrl,
+            $this->featuredImagePath, $this->featuredImageCaption, $this->featuredImageCredit,
+            $this->seriesId, $this->seriesPart, $this->seoTitle, $this->seoDescription, $this->canonicalUrl,
+        );
+    }
 }

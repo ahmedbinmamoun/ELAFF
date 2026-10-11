@@ -9,6 +9,7 @@ use Database\Seeders\RolesAndPermissionsSeeder;
 use Elaf\Content\Application\ContentPermission as P;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
 use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
+use Elaf\Contributors\Application\ContributorPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,9 +28,9 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
 })->with([
     'writer' => [Role::Writer, [P::CreateArticles]],
     'contributor' => [Role::Contributor, [P::CreateArticles]],
-    'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors]],
-    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, P::PublishArticles, P::PromoteArticles]],
-    'admin' => [Role::Admin, [...P::cases(), IdentityPermission::ManageUsers]],
+    'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors]],
+    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, P::PublishArticles, P::PromoteArticles]],
+    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers]],
 ]);
 
 it('seeds the paper\'s twelve sections once, without overwriting edits (FR-TAX-01)', function (): void {
@@ -51,5 +52,7 @@ it('seeds demo content in every workflow state, once', function (): void {
     expect(ArticleModel::query()->count())->toBe(40)
         ->and(ArticleModel::query()->distinct()->pluck('status')->sort()->values()->all())
         ->toBe(['approved', 'draft', 'in_review', 'published', 'returned', 'scheduled'])
-        ->and(User::query()->where('email', 'editor@elaf.test')->first()?->hasRole('editor'))->toBeTrue();
+        ->and(User::query()->where('email', 'editor@elaf.test')->first()?->hasRole('editor'))->toBeTrue()
+        ->and(User::query()->where('email', 'contributor@elaf.test')->first()?->type)->toBe('contributor')
+        ->and(DB::table('contributor_profiles')->count())->toBe(1);
 });

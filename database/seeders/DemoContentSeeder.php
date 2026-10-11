@@ -24,6 +24,7 @@ use Elaf\Content\Infrastructure\Persistence\Models\AuthorModel;
 use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Content\Infrastructure\Persistence\Models\SeriesModel;
 use Elaf\Content\Infrastructure\Persistence\Models\TagModel;
+use Elaf\Contributors\Infrastructure\Persistence\ContributorProfileModel;
 use Elaf\Identity\Application\Role;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Shared\Application\Html\HtmlSanitizer;
@@ -53,6 +54,8 @@ final class DemoContentSeeder extends Seeder
 
     public function run(): void
     {
+        $this->contributor();
+
         if (ArticleModel::withTrashed()->exists()) {
             return;
         }
@@ -101,7 +104,7 @@ final class DemoContentSeeder extends Seeder
     {
         $users = [];
 
-        foreach (Role::cases() as $role) {
+        foreach (Role::staff() as $role) {
             $user = User::query()->firstOrCreate(
                 ['email' => $role->value.'@elaf.test'],
                 ['name' => $this->text->personName(), 'password' => self::PASSWORD, 'email_verified_at' => $this->clock->now()],
@@ -111,6 +114,32 @@ final class DemoContentSeeder extends Seeder
         }
 
         return $users;
+    }
+
+    /**
+     * An approved demo contributor (contributor@elaf.test) with profile,
+     * author and role, so the /writer portal can be tried out.
+     */
+    private function contributor(): void
+    {
+        $user = User::query()->firstOrNew(['email' => Role::Contributor->value.'@elaf.test']);
+        $user->forceFill([
+            'name' => $user->exists ? $user->name : 'كاتب ضيف تجريبي',
+            'password' => $user->exists ? $user->password : self::PASSWORD,
+            'type' => 'contributor',
+            'status' => 'active',
+            'email_verified_at' => $user->email_verified_at ?? $this->clock->now(),
+        ])->save();
+        $user->syncRoles([Role::Contributor->value]);
+
+        $author = AuthorModel::query()->firstOrCreate(['user_id' => $user->id], ['name' => $user->name, 'slug' => Slug::fromText('كاتب ضيف تجريبي')->value]);
+
+        ContributorProfileModel::query()->firstOrCreate(['user_id' => $user->id], [
+            'author_id' => $author->id,
+            'bio' => $this->text->sentence(),
+            'terms_accepted_at' => $this->clock->now(),
+            'approved_at' => $this->clock->now(),
+        ]);
     }
 
     /**

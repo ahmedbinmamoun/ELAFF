@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
+use Elaf\Content\Application\Article\ArticleCounts;
 use Elaf\Content\Application\Article\ArticleInput;
 use Elaf\Content\Application\Article\DueScheduledArticles;
+use Elaf\Content\Application\Article\EditorialSettings;
 use Elaf\Content\Application\Article\Revision\ArticleRevisions;
 use Elaf\Content\Application\Author\AuthorData;
 use Elaf\Content\Application\Author\AuthorRepository;
@@ -17,9 +19,16 @@ use Elaf\Content\Application\Series\SeriesRepository;
 use Elaf\Content\Application\Tag\TagQueries;
 use Elaf\Content\Application\Tag\TagRepository;
 use Elaf\Content\Domain\Article\ArticleRepository;
+use Elaf\Contributors\Application\AuthorProfiles;
+use Elaf\Contributors\Application\ContributorAccounts;
+use Elaf\Contributors\Application\ContributorSettings;
+use Elaf\Contributors\Domain\ContributorRepository;
+use Elaf\Contributors\Infrastructure\ContentAuthorProfiles;
+use Elaf\Identity\Application\RoleAssignments;
 use Elaf\Identity\Application\StaffUser\PasswordHasher;
 use Elaf\Identity\Application\StaffUser\StaffUserRepository;
 use Elaf\Shared\Application\Authorization\Authorizer;
+use Elaf\Shared\Application\Captcha\CaptchaVerifier;
 use Elaf\Shared\Application\Event\EventDispatcher;
 use Elaf\Shared\Application\Html\HtmlSanitizer;
 use Elaf\Shared\Application\Transaction\Transaction;
@@ -29,6 +38,8 @@ use Elaf\Shared\Infrastructure\Html\HtmlPurifierSanitizer;
 use LogicException;
 use ReflectionClass;
 use ReflectionNamedType;
+use Tests\Support\Fakes\FakeCaptchaVerifier;
+use Tests\Support\Fakes\FakeEditorialSettings;
 use Tests\Support\Fakes\FakePasswordHasher;
 use Tests\Support\Fakes\FrozenClock;
 use Tests\Support\Fakes\ImmediateTransaction;
@@ -37,6 +48,8 @@ use Tests\Support\Fakes\InMemoryArticleRevisions;
 use Tests\Support\Fakes\InMemoryAuthorizer;
 use Tests\Support\Fakes\InMemoryAuthorRepository;
 use Tests\Support\Fakes\InMemoryCategoryRepository;
+use Tests\Support\Fakes\InMemoryContributors;
+use Tests\Support\Fakes\InMemoryRoleAssignments;
 use Tests\Support\Fakes\InMemorySeriesRepository;
 use Tests\Support\Fakes\InMemoryStaffUserRepository;
 use Tests\Support\Fakes\InMemoryTagRepository;
@@ -72,6 +85,12 @@ final class ContentKit
 
     public readonly InMemoryStaffUserRepository $users;
 
+    public readonly FakeEditorialSettings $settings;
+
+    public readonly InMemoryContributors $contributors;
+
+    public readonly InMemoryRoleAssignments $roles;
+
     /** @var array<class-string, object> */
     private array $bindings;
 
@@ -89,6 +108,9 @@ final class ContentKit
         $this->revisions = new InMemoryArticleRevisions;
         $this->sanitizer = new HtmlPurifierSanitizer;
         $this->users = new InMemoryStaffUserRepository;
+        $this->settings = new FakeEditorialSettings;
+        $this->contributors = new InMemoryContributors;
+        $this->roles = new InMemoryRoleAssignments;
 
         $this->bindings = [
             Clock::class => $this->clock,
@@ -106,7 +128,15 @@ final class ContentKit
             HtmlSanitizer::class => $this->sanitizer,
             StaffUserRepository::class => $this->users,
             PasswordHasher::class => new FakePasswordHasher,
+            ArticleCounts::class => $this->articles,
+            EditorialSettings::class => $this->settings,
+            ContributorSettings::class => $this->settings,
+            ContributorRepository::class => $this->contributors,
+            ContributorAccounts::class => $this->contributors,
+            RoleAssignments::class => $this->roles,
+            CaptchaVerifier::class => new FakeCaptchaVerifier,
         ];
+        $this->bindings[AuthorProfiles::class] = new ContentAuthorProfiles($this->authors);
     }
 
     /**

@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use BackedEnum;
 use Elaf\Content\Application\ContentPermission;
+use Elaf\Contributors\Application\ContributorPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
 use Illuminate\Database\Seeder;
@@ -25,7 +26,7 @@ final class RolesAndPermissionsSeeder extends Seeder
      */
     public static function permissions(): array
     {
-        return [...ContentPermission::cases(), ...IdentityPermission::cases()];
+        return [...ContentPermission::cases(), ...ContributorPermission::cases(), ...IdentityPermission::cases()];
     }
 
     /**
@@ -40,6 +41,7 @@ final class RolesAndPermissionsSeeder extends Seeder
             ContentPermission::ReviewArticles,
             ContentPermission::ManageTaxonomy,
             ContentPermission::ManageAuthors,
+            ContributorPermission::ManageContributors,
         ];
         $editorInChief = [...$editor, ContentPermission::PublishArticles, ContentPermission::PromoteArticles];
 

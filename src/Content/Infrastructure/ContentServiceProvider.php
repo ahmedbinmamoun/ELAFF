@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Elaf\Content\Infrastructure;
 
+use Elaf\Content\Application\Article\ArticleCounts;
 use Elaf\Content\Application\Article\DueScheduledArticles;
 use Elaf\Content\Application\Article\Revision\ArticleRevisions;
 use Elaf\Content\Application\Author\AuthorRepository;
@@ -70,6 +71,7 @@ final class ContentServiceProvider extends ServiceProvider
     {
         $this->app->alias(EloquentArticleRepository::class, ArticleRepository::class);
         $this->app->alias(EloquentArticleRepository::class, DueScheduledArticles::class);
+        $this->app->alias(EloquentArticleRepository::class, ArticleCounts::class);
         $this->app->alias(EloquentTagRepository::class, TagRepository::class);
         $this->app->alias(EloquentTagRepository::class, TagQueries::class);
     }

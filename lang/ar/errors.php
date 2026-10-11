@@ -31,6 +31,16 @@ return [
     'invalid_role' => 'الدور المختار غير صالح.',
     'cannot_demote_self' => 'لا يمكنك إزالة صلاحية المدير عن حسابك.',
 
+    'too_many_in_review' => 'لديك :max مقالات قيد المراجعة بالفعل. انتظر حتى يُراجع أحدها.',
+    'captcha_failed' => 'تعذّر التحقق من أنك لست برنامجاً آلياً. أعد المحاولة.',
+    'terms_required' => 'يجب الموافقة على شروط الكتابة.',
+    'invalid_display_name' => 'الاسم مطلوب ولا يتجاوز 120 حرفاً.',
+    'invalid_bio' => 'النبذة مطلوبة ولا تتجاوز 1000 حرف.',
+    'invalid_phone' => 'رقم الهاتف غير صالح.',
+    'rejection_reason_required' => 'اكتب سبب الرفض.',
+    'no_pending_name_change' => 'لا يوجد طلب تغيير اسم.',
+    'illegal_contributor_transition' => 'لا يمكن تنفيذ هذا الإجراء على الحساب في حالته الحالية.',
+
     // Article workflow
     'own_article_approval' => 'لا يمكنك اعتماد مقال كتبته بنفسك.',
     'return_note_required' => 'اكتب ملاحظة للكاتب عند إعادة المقال.',

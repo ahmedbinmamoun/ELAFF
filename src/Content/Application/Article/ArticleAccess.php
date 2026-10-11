@@ -6,6 +6,7 @@ namespace Elaf\Content\Application\Article;
 
 use Elaf\Content\Application\ContentPermission;
 use Elaf\Content\Domain\Article\Article;
+use Elaf\Content\Domain\Article\ArticleOrigin;
 use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Shared\Application\Authorization\Authorizer;
@@ -20,7 +21,10 @@ use Elaf\Shared\Application\Authorization\NotAuthorized;
  */
 final readonly class ArticleAccess
 {
-    public function __construct(private Authorizer $authorizer) {}
+    public function __construct(
+        private Authorizer $authorizer,
+        private EditorialSettings $settings,
+    ) {}
 
     public function require(ContentPermission $permission): void
     {
@@ -41,6 +45,25 @@ final readonly class ArticleAccess
     public function canSubmit(UserId $actor, UserId $writer): bool
     {
         return $actor->equals($writer) || $this->authorizer->allows(ContentPermission::EditAnyArticle->value);
+    }
+
+    /**
+     * Publishing is the Editor-in-Chief's (PRD §2), unless the setting lets
+     * editors publish contributor articles (FR-CON-08).
+     */
+    public function canPublish(ArticleOrigin $origin): bool
+    {
+        return $this->authorizer->allows(ContentPermission::PublishArticles->value)
+            || ($origin === ArticleOrigin::Contributor
+                && $this->settings->editorsCanPublishContributorArticles()
+                && $this->authorizer->allows(ContentPermission::ReviewArticles->value));
+    }
+
+    public function requireCanPublish(Article $article): void
+    {
+        if (! $this->canPublish($article->origin())) {
+            throw NotAuthorized::lacks(ContentPermission::PublishArticles->value);
+        }
     }
 
     public function requireCanEdit(Article $article, UserId $actor): void

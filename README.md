@@ -10,7 +10,7 @@ make up      # creates .env, builds images, installs deps, migrates
 make check   # Pint + Larastan (max) + Pest on MySQL
 ```
 
-Site: http://localhost:8080 · Admin: http://localhost:8080/admin · Health: http://localhost:8080/up · Mail: http://localhost:8025
+Site: http://localhost:8080 · Admin: http://localhost:8080/admin · Writers: http://localhost:8080/writer · Health: http://localhost:8080/up · Mail: http://localhost:8025
 
 Other targets: `make help`.
 
@@ -21,6 +21,11 @@ Other targets: `make help`.
   and one user per role: `writer@elaf.test`, `contributor@elaf.test`,
   `editor@elaf.test`, `editor-in-chief@elaf.test`, `admin@elaf.test`, password
   `password`.
+- `contributor@elaf.test` is an approved contributor for the writers' portal
+  (`/writer`); new contributors register at `/writers/register` (emails land in
+  Mailpit).
+- Contributor switches live in `.env` (`ELAF_CONTRIBUTORS_*`); Turnstile keys
+  (`TURNSTILE_*`) are required in production.
 - The scheduler publishes scheduled articles every minute
   (`php artisan articles:publish-scheduled`).
 

@@ -7,6 +7,7 @@ namespace Elaf\Content\Application\Article\UpdateArticle;
 use Elaf\Content\Application\Article\ArticleAccess;
 use Elaf\Content\Application\Article\ArticleContentFactory;
 use Elaf\Content\Application\Article\ArticleUnitOfWork;
+use Elaf\Content\Application\Article\ContributorByline;
 use Elaf\Content\Application\Article\Revision\ArticleRevisions;
 use Elaf\Content\Domain\Article\Article;
 use Elaf\Content\Domain\Article\ArticleId;
@@ -24,6 +25,7 @@ final readonly class UpdateArticleHandler
         private ArticleContentFactory $contentFactory,
         private ArticleRevisions $revisions,
         private ArticleAccess $access,
+        private ContributorByline $byline,
         private Transaction $transaction,
         private Clock $clock,
     ) {}
@@ -36,7 +38,8 @@ final readonly class UpdateArticleHandler
 
         $this->transaction->run(function () use ($command, $article, $actor): void {
             $previous = $article->content();
-            $article->revise($this->contentFactory->create($command->article, $article->origin()), $actor, $this->clock);
+            $input = $this->byline->apply($command->article, $article->origin(), $article->createdBy(), $actor);
+            $article->revise($this->contentFactory->create($input, $article->origin()), $actor, $this->clock);
 
             if ($article->content()->equals($previous)) {
                 return;

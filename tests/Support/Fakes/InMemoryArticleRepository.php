@@ -5,17 +5,20 @@ declare(strict_types=1);
 namespace Tests\Support\Fakes;
 
 use DateTimeImmutable;
+use Elaf\Content\Application\Article\ArticleCounts;
 use Elaf\Content\Application\Article\DueScheduledArticles;
 use Elaf\Content\Domain\Article\Article;
 use Elaf\Content\Domain\Article\ArticleId;
 use Elaf\Content\Domain\Article\ArticleRepository;
+use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Content\Domain\Article\Exception\ArticleNotFound;
+use Elaf\Identity\Domain\UserId;
 
 /**
  * Stores copies, like a database would: changing an aggregate without
  * save() is not visible to the next get().
  */
-final class InMemoryArticleRepository implements ArticleRepository, DueScheduledArticles
+final class InMemoryArticleRepository implements ArticleCounts, ArticleRepository, DueScheduledArticles
 {
     /** @var array<int, Article> */
     private array $articles = [];
@@ -52,5 +55,18 @@ final class InMemoryArticleRepository implements ArticleRepository, DueScheduled
         usort($due, static fn (Article $a, Article $b): int => [$a->scheduledFor(), $a->id()->value] <=> [$b->scheduledFor(), $b->id()->value]);
 
         return array_map(static fn (Article $a): ArticleId => $a->id(), $due);
+    }
+
+    public function inReviewBy(UserId $writer): int
+    {
+        return count(array_filter($this->articles, static fn (Article $a): bool => $a->isCreatedBy($writer) && $a->status() === ArticleStatus::InReview));
+    }
+
+    public function publishedBy(UserId $writer): array
+    {
+        $published = array_filter($this->articles, static fn (Article $a): bool => $a->isCreatedBy($writer) && $a->status() === ArticleStatus::Published);
+        ksort($published);
+
+        return array_values(array_map(static fn (Article $a): ArticleId => $a->id(), $published));
     }
 }
