@@ -9,6 +9,8 @@ use Elaf\Content\Application\Article\DueScheduledArticles;
 use Elaf\Content\Application\Article\Revision\ArticleRevisions;
 use Elaf\Content\Application\Author\AuthorRepository;
 use Elaf\Content\Application\Category\CategoryRepository;
+use Elaf\Content\Application\Query\ArticleQueries;
+use Elaf\Content\Application\Query\TaxonomyQueries;
 use Elaf\Content\Application\Series\SeriesRepository;
 use Elaf\Content\Application\Tag\TagQueries;
 use Elaf\Content\Application\Tag\TagRepository;
@@ -33,6 +35,8 @@ use Elaf\Content\Infrastructure\Persistence\Eloquent\EloquentAuthorRepository;
 use Elaf\Content\Infrastructure\Persistence\Eloquent\EloquentCategoryRepository;
 use Elaf\Content\Infrastructure\Persistence\Eloquent\EloquentSeriesRepository;
 use Elaf\Content\Infrastructure\Persistence\Eloquent\EloquentTagRepository;
+use Elaf\Content\Infrastructure\Query\EloquentArticleQueries;
+use Elaf\Content\Infrastructure\Query\EloquentTaxonomyQueries;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 
@@ -65,6 +69,8 @@ final class ContentServiceProvider extends ServiceProvider
         SeriesRepository::class => EloquentSeriesRepository::class,
         AuthorRepository::class => EloquentAuthorRepository::class,
         ArticleRevisions::class => EloquentArticleRevisions::class,
+        ArticleQueries::class => EloquentArticleQueries::class,
+        TaxonomyQueries::class => EloquentTaxonomyQueries::class,
     ];
 
     public function register(): void
