@@ -32,6 +32,7 @@ final readonly class ArticleController
             'article' => $article,
             'related' => $this->articles->related($id, $article->card->category->id, 4),
             'guestLabel' => $article->card->byContributor && $this->settings->showGuestBylineLabel(),
+            'mostRead' => $this->articles->mostRead(PublicPage::MOST_READ),
         ]);
     }
 }

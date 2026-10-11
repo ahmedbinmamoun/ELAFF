@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Elaf\Layout\Presentation\Homepage\Blocks;
+
+use Elaf\Content\Application\Query\ArticleQueries;
+use Elaf\Layout\Presentation\Homepage\HomepageBlockRenderer;
+use Elaf\Layout\Presentation\Homepage\HomepageContext;
+use Elaf\Shared\Domain\Time\Clock;
+use Illuminate\Contracts\View\View;
+
+/**
+ * "الأكثر قراءة" numbered list (FR-HOME-02 "most_read"). May repeat articles
+ * shown above: it is a ranking, not a feed.
+ */
+final readonly class MostReadBlock implements HomepageBlockRenderer
+{
+    public function __construct(
+        private ArticleQueries $articles,
+        private Clock $clock,
+    ) {}
+
+    public function type(): string
+    {
+        return 'most_read';
+    }
+
+    public function render(array $options, HomepageContext $context): ?View
+    {
+        $days = BlockOptions::int($options, 'days', 30, 365);
+        $cards = $this->articles->mostRead(BlockOptions::int($options, 'limit', 5, 10), $days > 0 ? $this->clock->now()->modify("-{$days} days") : null);
+
+        return $cards === [] ? null : view('homepage.blocks.most-read', ['cards' => $cards]);
+    }
+}

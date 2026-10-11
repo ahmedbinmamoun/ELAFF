@@ -30,6 +30,6 @@ final readonly class AuthorController
         $articles = $this->articles->byAuthor($author->id, PublicPage::page($request), PublicPage::PER_PAGE);
         PublicPage::abortPastEnd($articles);
 
-        return view('content.author', ['author' => $author, 'articles' => $articles]);
+        return view('content.author', ['author' => $author, 'articles' => $articles, 'mostRead' => $this->articles->mostRead(PublicPage::MOST_READ)]);
     }
 }
