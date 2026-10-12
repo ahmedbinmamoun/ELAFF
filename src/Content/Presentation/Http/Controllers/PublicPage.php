@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Elaf\Content\Presentation\Http\Controllers;
 
-use Elaf\Content\Application\Query\Paginated;
+use Elaf\Shared\Application\Query\Paginated;
 use Illuminate\Http\Request;
 
 /**

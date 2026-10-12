@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elaf\Content\Application\Query;
 
 use DateTimeImmutable;
+use Elaf\Shared\Application\Query\Paginated;
 
 /**
  * Public read side (PRD §5.6): published articles only, as DTOs. Each method
