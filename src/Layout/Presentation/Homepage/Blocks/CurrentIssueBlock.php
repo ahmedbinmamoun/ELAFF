@@ -6,15 +6,16 @@ namespace Elaf\Layout\Presentation\Homepage\Blocks;
 
 use Elaf\Layout\Presentation\Homepage\HomepageBlockRenderer;
 use Elaf\Layout\Presentation\Homepage\HomepageContext;
+use Elaf\Publishing\Application\Query\IssueQueries;
 use Illuminate\Contracts\View\View;
 
 /**
- * Latest print issue (FR-HOME-02 "current_issue"). Registered now so the
- * homepage configuration is complete; it shows the issue once the issues
- * archive exists (Phase 4, FR-ISS-04).
+ * Latest print issue with its cover (FR-HOME-02 "current_issue", FR-ISS-04).
  */
 final readonly class CurrentIssueBlock implements HomepageBlockRenderer
 {
+    public function __construct(private IssueQueries $issues) {}
+
     public function type(): string
     {
         return 'current_issue';
@@ -22,6 +23,8 @@ final readonly class CurrentIssueBlock implements HomepageBlockRenderer
 
     public function render(array $options, HomepageContext $context): ?View
     {
-        return null;
+        $issue = $this->issues->latest();
+
+        return $issue === null ? null : view('homepage.blocks.current-issue', ['issue' => $issue]);
     }
 }

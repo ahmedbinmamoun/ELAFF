@@ -54,6 +54,10 @@ final class Icons
         'mail' => 'M4 6h16v12H4V6Zm0 0 8 7 8-7',
         'bolt' => 'M13 3 5 14h6l-1 7 8-11h-6l1-7Z',
         'trending' => 'M4 16 10 10l4 4 6-6m0 0h-5m5 0v5',
+        'download' => 'M12 4v11m0 0-4-4m4 4 4-4M5 20h14',
+        'zoom-in' => 'm20 20-4-4m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0ZM11 8v6m-3-3h6',
+        'zoom-out' => 'm20 20-4-4m2-5a7 7 0 1 1-14 0 7 7 0 0 1 14 0ZM8 11h6',
+        'pages' => 'M9 4h10v14H9V4ZM5 7v13h11',
     ];
 
     /** Brand marks (filled). */

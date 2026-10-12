@@ -17,7 +17,7 @@
                     {{ $block }}
                 @endforeach
             </div>
-            <aside class="space-y-6 md:col-span-5 lg:col-span-3">
+            <aside class="min-w-0 space-y-6 md:col-span-5 lg:col-span-3">
                 @foreach ($regions['aside'] as $block)
                     {{ $block }}
                 @endforeach

@@ -9,6 +9,8 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Elaf\Content\Application\Article\ApproveArticle\ApproveArticleCommand;
 use Elaf\Content\Application\Article\ApproveArticle\ApproveArticleHandler;
+use Elaf\Content\Application\Article\AssignArticleToIssue\AssignArticleToIssueCommand;
+use Elaf\Content\Application\Article\AssignArticleToIssue\AssignArticleToIssueHandler;
 use Elaf\Content\Application\Article\MarkArticleBreaking\MarkArticleBreakingCommand;
 use Elaf\Content\Application\Article\MarkArticleBreaking\MarkArticleBreakingHandler;
 use Elaf\Content\Application\Article\PromoteArticle\PromoteArticleCommand;
@@ -30,10 +32,12 @@ use Elaf\Content\Application\Article\WithdrawSubmission\WithdrawSubmissionHandle
 use Elaf\Content\Application\ContentPermission;
 use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
+use Elaf\Publishing\Infrastructure\Persistence\IssueModel;
 use Elaf\Shared\Presentation\Filament\UseCaseErrors;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -67,6 +71,7 @@ final class ArticleWorkflowActions
             self::markBreaking(),
             self::unmarkBreaking(),
             self::promote(),
+            self::assignIssue(),
         ];
     }
 
@@ -177,6 +182,44 @@ final class ArticleWorkflowActions
             ->schema([
                 Toggle::make('featured')->label(__('admin.workflow.fields.featured')),
                 TextInput::make('homepage_priority')->label(__('admin.workflow.fields.homepage_priority'))->integer()->minValue(0)->default(0),
+            ]);
+    }
+
+    /**
+     * FR-ART-01: the print issue and page the article appeared on.
+     */
+    public static function assignIssue(): Action
+    {
+        return self::make('assign_issue', Heroicon::OutlinedNewspaper, 'gray',
+            static fn (ArticleModel $a): bool => Gate::allows(ContentPermission::EditAnyArticle->value),
+            static fn (ArticleModel $a, array $d, int $actor) => app(AssignArticleToIssueHandler::class)->handle(new AssignArticleToIssueCommand(
+                $actor,
+                $a->id,
+                is_numeric($d['issue_id'] ?? null) ? (int) $d['issue_id'] : null,
+                is_numeric($d['issue_page'] ?? null) ? (int) $d['issue_page'] : null,
+            )),
+        )
+            ->fillForm(static fn (ArticleModel $record): array => ['issue_id' => $record->issue_id, 'issue_page' => $record->issue_page])
+            ->schema([
+                Select::make('issue_id')
+                    ->label(__('admin.workflow.fields.issue'))
+                    ->helperText(__('admin.workflow.fields.issue_hint'))
+                    ->options(static fn (): array => IssueModel::query()
+                        ->orderByDesc('number')
+                        ->limit(200)
+                        ->get(['id', 'number', 'published_on'])
+                        ->mapWithKeys(static fn (IssueModel $issue): array => [$issue->id => (string) __('admin.issue.option', [
+                            'number' => $issue->number,
+                            'date' => $issue->published_on->format('Y-m-d'),
+                        ])])
+                        ->all())
+                    ->searchable()
+                    ->live(),
+                TextInput::make('issue_page')
+                    ->label(__('admin.workflow.fields.issue_page'))
+                    ->integer()
+                    ->minValue(1)
+                    ->required(static fn (callable $get): bool => filled($get('issue_id'))),
             ]);
     }
 
