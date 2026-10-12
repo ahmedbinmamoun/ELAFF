@@ -18,6 +18,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 use Tests\Support\AdminFixtures;
+use Tests\Support\SettingsFixtures;
 
 uses(RefreshDatabase::class);
 
@@ -82,13 +83,13 @@ it('leaves publishing to the Editor-in-Chief unless editors are allowed (FR-CON-
     $this->actingAs($this->editor);
     $view($article)->assertActionHidden('publish')->assertActionHidden('schedule');
 
-    config(['elaf.contributors.editor_can_publish' => true]);
+    SettingsFixtures::set(['contributors_editor_can_publish' => true]);
     $view($staffArticle)->assertActionHidden('publish');
     $view($article)->assertActionVisible('publish')->assertActionVisible('schedule')->callAction('publish');
     expect($article->refresh()->status)->toBe('published');
     Mail::assertQueued(ElafMail::class, static fn (ElafMail $m): bool => $m->hasTo($contributor->email) && $m->subjectLine === __('mail.article_published.subject', ['title' => $article->title]));
 
-    config(['elaf.contributors.editor_can_publish' => false]);
+    SettingsFixtures::set(['contributors_editor_can_publish' => false]);
     $other = AdminFixtures::contributorArticle(ArticleStatus::Approved, $contributor, 'آخر');
     $this->actingAs(AdminFixtures::user(Role::EditorInChief));
     $view($other)->callAction('publish');

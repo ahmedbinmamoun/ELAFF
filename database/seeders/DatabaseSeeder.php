@@ -17,10 +17,14 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             CategorySeeder::class,
+            HomepageBlocksSeeder::class,
         ]);
 
         if (app()->environment('local')) {
-            $this->call([DemoContentSeeder::class, DemoIssuesSeeder::class]);
+            $this->call([DemoContentSeeder::class, DemoIssuesSeeder::class, DemoPagesSeeder::class]);
         }
+
+        // Last: the footer menu links the pages that exist by now.
+        $this->call(MenusSeeder::class);
     }
 }

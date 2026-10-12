@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\MenusSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Elaf\Content\Infrastructure\Persistence\Models\AuthorModel;
 use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Content\Infrastructure\Persistence\Models\SeriesModel;
 use Elaf\Content\Infrastructure\Persistence\Models\TagModel;
+use Elaf\Settings\Infrastructure\CachedSettingsReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\PublicFixtures;
@@ -16,12 +18,13 @@ uses(RefreshDatabase::class);
 
 /*
  * Phase 3 acceptance: no N+1. Every page also pays a fixed cost for the
+ * settings (one query, then cached), the active ads (one query) and
  * header (sections, breaking ticker) and, on listings, the "most read" aside. Each key page runs a fixed number of queries,
  * the same with twice as much content.
  */
 
 beforeEach(function (): void {
-    $this->seed([RolesAndPermissionsSeeder::class, CategorySeeder::class]);
+    $this->seed([RolesAndPermissionsSeeder::class, CategorySeeder::class, MenusSeeder::class]);
     $this->fx = new PublicFixtures;
     $this->categories = CategoryModel::query()->orderBy('sort_order')->pluck('id')->all();
     $this->authors = [
@@ -51,6 +54,7 @@ beforeEach(function (): void {
 
     $this->queries = function (string $path): int {
         $this->app->forgetScopedInstances();
+        cache()->forget(CachedSettingsReader::CACHE_KEY);
         DB::flushQueryLog();
         DB::enableQueryLog();
         $this->get($path)->assertOk();
@@ -81,9 +85,9 @@ it('runs a constant, small number of queries per page', function (string $page, 
 })->with([
     'home' => ['home', 16],
     'article' => ['article', 12],
-    'category' => ['category', 9],
-    'author' => ['author', 9],
-    'tag' => ['tag', 9],
-    'series' => ['series', 5],
+    'category' => ['category', 10],
+    'author' => ['author', 10],
+    'tag' => ['tag', 10],
+    'series' => ['series', 7],
     'feed' => ['feed', 4],
 ]);

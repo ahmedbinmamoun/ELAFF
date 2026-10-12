@@ -42,6 +42,45 @@ return [
     'no_pending_name_change' => 'لا يوجد طلب تغيير اسم.',
     'illegal_contributor_transition' => 'لا يمكن تنفيذ هذا الإجراء على الحساب في حالته الحالية.',
 
+    // Settings
+    'invalid_analytics_id' => 'معرّف الإحصاءات غير صالح (مثال: G-ABC123XYZ).',
+    'invalid_path' => 'مسار الملف غير صالح.',
+
+    // Homepage
+    'unknown_block_type' => 'نوع الكتلة غير معروف.',
+    'unknown_region' => 'المكان غير صالح.',
+    'invalid_block_option' => 'إعدادات الكتلة غير صالحة.',
+    'stale_block_order' => 'تغيّرت قائمة الكتل في الأثناء، أعد تحميل الصفحة.',
+
+    // Reader letters
+    'letter_name' => 'الاسم مطلوب ولا يتجاوز 100 حرف.',
+    'letter_title' => 'العنوان مطلوب ولا يتجاوز 150 حرفاً.',
+    'letter_body' => 'نص الرسالة من 20 إلى 5000 حرف.',
+    'letter_already_moderated' => 'رُوجعت هذه الرسالة من قبل.',
+    'letter_not_approved' => 'اقبل الرسالة أولاً ثم حوّلها إلى مقال.',
+    'letter_already_converted' => 'حُوّلت هذه الرسالة إلى مقال من قبل.',
+
+    // Ads
+    'unknown_ad_slot' => 'مكان الإعلان غير صالح.',
+    'ad_creative_required' => 'ارفع صورة أو أضف كود HTML.',
+    'ad_title' => 'العنوان مطلوب ولا يتجاوز 150 حرفاً.',
+    'ad_target_required' => 'إعلان الصورة يحتاج رابط وجهة.',
+    'ad_target_invalid' => 'رابط الوجهة يجب أن يبدأ بـ http أو https.',
+    'ad_weight' => 'الوزن من 1 إلى 100.',
+    'ad_schedule_order' => 'يجب أن ينتهي الإعلان بعد بدايته.',
+    'ad_image_invalid' => 'الصورة غير صالحة.',
+    'ad_html_empty' => 'كود HTML فارغ.',
+    'ad_html_too_long' => 'كود HTML أطول من المسموح.',
+
+    // Menus
+    'unknown_menu' => 'القائمة غير معروفة.',
+    'menu_too_long' => 'القائمة لا تتسع لأكثر من :max عنصراً.',
+    'menu_too_deep' => 'العنصر :position: القوائم تقبل مستوى واحداً من العناصر الفرعية.',
+    'menu_item_label' => 'العنصر :position: النص مطلوب ولا يتجاوز 60 حرفاً.',
+    'menu_item_type' => 'العنصر :position: نوع الرابط غير صالح.',
+    'menu_item_target' => 'العنصر :position: القسم أو الصفحة المختارة غير موجودة.',
+    'menu_item_url' => 'العنصر :position: الرابط يجب أن يبدأ بـ / أو http(s)://.',
+
     // Print issues
     'issue_number_taken' => 'العدد رقم :number موجود بالفعل.',
     'number_not_positive' => 'رقم العدد يجب أن يكون 1 أو أكثر.',

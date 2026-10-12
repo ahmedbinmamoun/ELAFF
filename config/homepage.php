@@ -10,10 +10,13 @@ declare(strict_types=1);
  * region: top (full width) | main (centre column) | aside (end column on
  * desktop) | bottom (full width). On mobile all regions stack in that order.
  *
- * Phase 5 moves this list into the homepage_blocks table, editable in the admin.
+ * This is the composition of a fresh installation: once blocks are stored
+ * (HomepageBlocksSeeder, then the admin's homepage screen), the
+ * homepage_blocks table is used instead.
  */
 return [
     'blocks' => [
+        ['type' => 'breaking_ticker', 'region' => 'top', 'options' => []],
         ['type' => 'hero', 'region' => 'top', 'options' => ['secondary' => 3]],
         ['type' => 'latest_articles', 'region' => 'main', 'options' => ['featured' => 2, 'strip' => 8]],
         ['type' => 'most_read', 'region' => 'aside', 'options' => ['limit' => 5, 'days' => 30]],

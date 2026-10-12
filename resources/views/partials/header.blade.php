@@ -1,9 +1,8 @@
 @php
     $navLimit = 7;
-    $primary = array_slice($navigation, 0, $navLimit);
-    $more = array_slice($navigation, $navLimit);
+    $primary = array_slice($menus['header'] ?? [], 0, $navLimit);
+    $more = array_slice($menus['header'] ?? [], $navLimit);
     $isHome = request()->routeIs('home');
-    $currentSlug = request()->route('slug');
 @endphp
 <header x-data="{ drawer: false, search: false }" x-on:keydown.escape.window="drawer = false; search = false" class="bg-paper">
     {{-- Desktop: date and social row --}}
@@ -27,10 +26,15 @@
         <button type="button" class="flex h-tap w-tap shrink-0 items-center justify-center rounded-card text-brand lg:hidden" x-on:click="drawer = true" aria-label="{{ __('public.menu') }}">
             <x-svg-icon name="menu" class="h-6 w-6" />
         </button>
-        <a href="{{ route('home') }}" class="flex flex-1 flex-col items-center leading-none lg:flex-none lg:items-start" aria-label="{{ __('site.name') }}">
-            <span class="font-serif text-4xl font-black text-brand lg:text-6xl">{{ __('site.name') }}</span>
-            @if ($site['logo_suffix'] ?? null)
-                <span class="mt-1 text-sm font-bold text-accent lg:text-lg">{{ $site['logo_suffix'] }}</span>
+        <a href="{{ route('home') }}" class="flex flex-1 flex-col items-center leading-none lg:flex-none lg:items-start" aria-label="{{ $site['name'] ?? __('site.name') }}">
+            @if ($site['logo_url'] ?? null)
+                {{-- Uploaded logo (FR-SET-01): a fixed height keeps the header from shifting. --}}
+                <img src="{{ $site['logo_url'] }}" alt="{{ $site['name'] ?? __('site.name') }}" height="64" class="h-12 w-auto lg:h-20" fetchpriority="high">
+            @else
+                <span class="font-serif text-4xl font-black text-brand lg:text-6xl">{{ $site['name'] ?? __('site.name') }}</span>
+                @if ($site['logo_suffix'] ?? null)
+                    <span class="mt-1 text-sm font-bold text-accent lg:text-lg">{{ $site['logo_suffix'] }}</span>
+                @endif
             @endif
         </a>
         <div class="hidden lg:block">
@@ -73,8 +77,22 @@
             <ul class="nav-scroll flex min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-sm font-semibold">
                 <li><a href="{{ route('home') }}" class="flex h-12 items-center px-4 {{ $isHome ? 'bg-accent' : 'hover:bg-brand-light' }}" @if ($isHome) aria-current="page" @endif>{{ __('public.home') }}</a></li>
                 @foreach ($primary as $item)
-                    @php($active = $currentSlug === $item->slug && request()->routeIs('category.show'))
-                    <li><a href="{{ route('category.show', $item->slug) }}" class="flex h-12 items-center px-4 {{ $active ? 'bg-accent' : 'hover:bg-brand-light' }}" @if ($active) aria-current="page" @endif>{{ $item->name }}</a></li>
+                    @if ($item->children === [])
+                        <li><a href="{{ $item->url }}" class="flex h-12 items-center px-4 {{ $item->active ? 'bg-accent' : 'hover:bg-brand-light' }}" @if ($item->active) aria-current="page" @endif @if ($item->external) rel="noopener" @endif>{{ $item->label }}</a></li>
+                    @else
+                        {{-- One level of sub-items (FR-NAV-01). --}}
+                        <li class="relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
+                            <button type="button" class="flex h-12 items-center gap-1 px-4 {{ $item->active ? 'bg-accent' : 'hover:bg-brand-light' }}" x-on:click="open = !open" x-bind:aria-expanded="open.toString()" aria-expanded="false" aria-haspopup="true">
+                                {{ $item->label }} <x-svg-icon name="chevron-down" class="h-4 w-4" />
+                            </button>
+                            <ul class="fixed z-30 mt-0 w-52 rounded-b-card bg-paper py-1 text-ink shadow-lg" x-show="open" x-cloak x-transition.opacity>
+                                <li><a href="{{ $item->url }}" class="flex min-h-tap items-center px-4 font-semibold hover:bg-canvas">{{ $item->label }}</a></li>
+                                @foreach ($item->children as $child)
+                                    <li><a href="{{ $child->url }}" class="flex min-h-tap items-center px-4 hover:bg-canvas" @if ($child->external) rel="noopener" @endif>{{ $child->label }}</a></li>
+                                @endforeach
+                            </ul>
+                        </li>
+                    @endif
                 @endforeach
             </ul>
             @if ($more !== [])
@@ -84,8 +102,11 @@
                     </button>
                     <ul class="absolute end-0 top-full z-30 w-52 rounded-b-card bg-paper py-1 text-ink shadow-lg" x-show="open" x-cloak x-transition.opacity>
                         @foreach ($more as $item)
-                            <li><a href="{{ route('category.show', $item->slug) }}" class="flex min-h-tap items-center gap-2 px-4 hover:bg-canvas">
-                                @if ($item->icon)<x-svg-icon :name="$item->icon" class="h-5 w-5 text-brand" />@endif{{ $item->name }}</a></li>
+                            <li><a href="{{ $item->url }}" class="flex min-h-tap items-center gap-2 px-4 hover:bg-canvas" @if ($item->external) rel="noopener" @endif>
+                                @if ($item->icon)<x-svg-icon :name="$item->icon" class="h-5 w-5 text-brand" />@endif{{ $item->label }}</a></li>
+                            @foreach ($item->children as $child)
+                                <li><a href="{{ $child->url }}" class="flex min-h-tap items-center px-4 ps-11 text-sm hover:bg-canvas" @if ($child->external) rel="noopener" @endif>{{ $child->label }}</a></li>
+                            @endforeach
                         @endforeach
                     </ul>
                 </div>
@@ -105,14 +126,17 @@
         <div class="absolute inset-0 bg-black/50" x-on:click="drawer = false" x-transition.opacity></div>
         <div class="absolute inset-y-0 start-0 flex w-80 max-w-[85vw] flex-col overflow-y-auto bg-paper shadow-xl" role="dialog" aria-modal="true" aria-label="{{ __('public.menu') }}" x-show="drawer" x-transition>
             <div class="flex items-center justify-between border-b border-rule px-4 py-2">
-                <span class="font-serif text-2xl font-black text-brand">{{ __('site.name') }}</span>
+                <span class="font-serif text-2xl font-black text-brand">{{ $site['name'] ?? __('site.name') }}</span>
                 <button type="button" class="flex h-tap w-tap items-center justify-center" x-on:click="drawer = false" aria-label="{{ __('public.close') }}"><x-svg-icon name="close" class="h-6 w-6" /></button>
             </div>
             <ul class="py-2">
                 <li><a href="{{ route('home') }}" class="flex min-h-tap items-center gap-3 px-4 font-semibold hover:bg-canvas"><x-svg-icon name="home" class="h-5 w-5 text-brand" />{{ __('public.home') }}</a></li>
-                @foreach ($navigation as $item)
-                    <li><a href="{{ route('category.show', $item->slug) }}" class="flex min-h-tap items-center gap-3 px-4 hover:bg-canvas">
-                        <x-svg-icon :name="$item->icon ?? 'grid'" class="h-5 w-5 text-brand" />{{ $item->name }}</a></li>
+                @foreach ($menus['sections'] ?? [] as $item)
+                    <li><a href="{{ $item->url }}" class="flex min-h-tap items-center gap-3 px-4 hover:bg-canvas {{ $item->active ? 'font-bold text-accent' : '' }}" @if ($item->external) rel="noopener" @endif>
+                        <x-svg-icon :name="$item->icon ?? 'grid'" class="h-5 w-5 text-brand" />{{ $item->label }}</a></li>
+                    @foreach ($item->children as $child)
+                        <li><a href="{{ $child->url }}" class="flex min-h-tap items-center px-4 ps-12 text-sm hover:bg-canvas" @if ($child->external) rel="noopener" @endif>{{ $child->label }}</a></li>
+                    @endforeach
                 @endforeach
             </ul>
             <ul class="border-t border-rule py-2 text-sm">

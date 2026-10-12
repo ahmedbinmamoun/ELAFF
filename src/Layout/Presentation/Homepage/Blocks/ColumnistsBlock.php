@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elaf\Layout\Presentation\Homepage\Blocks;
 
 use Elaf\Content\Application\Query\ArticleQueries;
+use Elaf\Layout\Presentation\Homepage\ConfigurableBlock;
 use Elaf\Layout\Presentation\Homepage\HomepageBlockRenderer;
 use Elaf\Layout\Presentation\Homepage\HomepageContext;
 use Illuminate\Contracts\View\View;
@@ -12,13 +13,23 @@ use Illuminate\Contracts\View\View;
 /**
  * Columnists with photo and latest column (FR-HOME-02 "columnists", FR-AUT-02).
  */
-final readonly class ColumnistsBlock implements HomepageBlockRenderer
+final readonly class ColumnistsBlock implements ConfigurableBlock, HomepageBlockRenderer
 {
     public function __construct(private ArticleQueries $articles) {}
 
     public function type(): string
     {
         return 'columnists';
+    }
+
+    public function label(): string
+    {
+        return BlockForm::label($this->type());
+    }
+
+    public function optionsForm(): array
+    {
+        return [BlockForm::number('limit', 6, 1, 12)];
     }
 
     public function render(array $options, HomepageContext $context): ?View

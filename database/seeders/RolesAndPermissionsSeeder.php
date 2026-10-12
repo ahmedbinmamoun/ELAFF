@@ -7,9 +7,12 @@ namespace Database\Seeders;
 use BackedEnum;
 use Elaf\Content\Application\ContentPermission;
 use Elaf\Contributors\Application\ContributorPermission;
+use Elaf\Engagement\Application\EngagementPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
+use Elaf\Layout\Application\LayoutPermission;
 use Elaf\Publishing\Application\IssuePermission;
+use Elaf\Settings\Application\SettingsPermission;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as RoleModel;
@@ -27,7 +30,7 @@ final class RolesAndPermissionsSeeder extends Seeder
      */
     public static function permissions(): array
     {
-        return [...ContentPermission::cases(), ...ContributorPermission::cases(), ...IdentityPermission::cases(), ...IssuePermission::cases()];
+        return [...ContentPermission::cases(), ...ContributorPermission::cases(), ...IdentityPermission::cases(), ...IssuePermission::cases(), ...SettingsPermission::cases(), ...LayoutPermission::cases(), ...EngagementPermission::cases()];
     }
 
     /**
@@ -43,8 +46,10 @@ final class RolesAndPermissionsSeeder extends Seeder
             ContentPermission::ManageTaxonomy,
             ContentPermission::ManageAuthors,
             ContributorPermission::ManageContributors,
+            EngagementPermission::ModerateLetters,
         ];
-        $editorInChief = [...$editor, ContentPermission::PublishArticles, ContentPermission::PromoteArticles, IssuePermission::ManageIssues];
+        $editorInChief = [...$editor, ContentPermission::PublishArticles, ContentPermission::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages,
+            LayoutPermission::ManageHomepage, LayoutPermission::ManageMenus, LayoutPermission::ManageAds];
 
         return [
             Role::Writer->value => $writer,

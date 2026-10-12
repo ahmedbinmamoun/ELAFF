@@ -13,6 +13,7 @@ use Elaf\Identity\Domain\UserId;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\Fakes\FrozenClock;
 use Tests\Support\PublicFixtures;
+use Tests\Support\SettingsFixtures;
 
 uses(RefreshDatabase::class);
 
@@ -98,7 +99,7 @@ it('answers 404 for articles that are not published', function (): void {
 });
 
 it('labels contributor bylines "كاتب ضيف" when the setting is on (FR-CON-13)', function (bool $on): void {
-    config(['elaf.contributors.guest_byline_label' => $on]);
+    SettingsFixtures::set(['contributors_guest_byline_label' => $on]);
     $article = $this->fx->published('مقال ضيف', $this->markets->id, [$this->reporter->id], origin: ArticleOrigin::Contributor);
 
     $response = $this->get(route('article.show', ['id' => $article->id, 'slug' => $article->slug]));

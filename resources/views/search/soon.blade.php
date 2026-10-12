@@ -15,8 +15,8 @@
     </x-page-header>
     <nav class="rounded-card border border-rule bg-paper p-4" aria-label="{{ __('public.sections') }}">
         <ul class="grid gap-1 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach ($navigation as $item)
-                <li><a href="{{ route('category.show', $item->slug) }}" class="flex min-h-tap items-center gap-3 rounded-card px-2 hover:bg-canvas"><x-svg-icon :name="$item->icon ?? 'grid'" class="h-5 w-5 text-brand" />{{ $item->name }}</a></li>
+            @foreach ($menus['sections'] ?? [] as $item)
+                <li><a href="{{ $item->url }}" class="flex min-h-tap items-center gap-3 rounded-card px-2 hover:bg-canvas"><x-svg-icon :name="$item->icon ?? 'grid'" class="h-5 w-5 text-brand" />{{ $item->label }}</a></li>
             @endforeach
         </ul>
     </nav>

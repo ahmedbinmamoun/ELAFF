@@ -6,6 +6,7 @@ namespace Elaf\Layout\Presentation\Homepage\Blocks;
 
 use Elaf\Content\Application\Query\ArticleCard;
 use Elaf\Content\Application\Query\ArticleQueries;
+use Elaf\Layout\Presentation\Homepage\ConfigurableBlock;
 use Elaf\Layout\Presentation\Homepage\HomepageBlockRenderer;
 use Elaf\Layout\Presentation\Homepage\HomepageContext;
 use Illuminate\Contracts\View\View;
@@ -13,13 +14,23 @@ use Illuminate\Contracts\View\View;
 /**
  * "آخر الأخبار": a few featured cards and a scrollable strip (FR-HOME-02 "latest_articles").
  */
-final readonly class LatestArticlesBlock implements HomepageBlockRenderer
+final readonly class LatestArticlesBlock implements ConfigurableBlock, HomepageBlockRenderer
 {
     public function __construct(private ArticleQueries $articles) {}
 
     public function type(): string
     {
         return 'latest_articles';
+    }
+
+    public function label(): string
+    {
+        return BlockForm::label($this->type());
+    }
+
+    public function optionsForm(): array
+    {
+        return [BlockForm::number('featured', 2, 0, 6), BlockForm::number('strip', 8, 0, 20)];
     }
 
     public function render(array $options, HomepageContext $context): ?View

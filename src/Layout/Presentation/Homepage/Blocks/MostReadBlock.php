@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Elaf\Layout\Presentation\Homepage\Blocks;
 
 use Elaf\Content\Application\Query\ArticleQueries;
+use Elaf\Layout\Presentation\Homepage\ConfigurableBlock;
 use Elaf\Layout\Presentation\Homepage\HomepageBlockRenderer;
 use Elaf\Layout\Presentation\Homepage\HomepageContext;
 use Elaf\Shared\Domain\Time\Clock;
@@ -14,7 +15,7 @@ use Illuminate\Contracts\View\View;
  * "الأكثر قراءة" numbered list (FR-HOME-02 "most_read"). May repeat articles
  * shown above: it is a ranking, not a feed.
  */
-final readonly class MostReadBlock implements HomepageBlockRenderer
+final readonly class MostReadBlock implements ConfigurableBlock, HomepageBlockRenderer
 {
     public function __construct(
         private ArticleQueries $articles,
@@ -24,6 +25,16 @@ final readonly class MostReadBlock implements HomepageBlockRenderer
     public function type(): string
     {
         return 'most_read';
+    }
+
+    public function label(): string
+    {
+        return BlockForm::label($this->type());
+    }
+
+    public function optionsForm(): array
+    {
+        return [BlockForm::number('limit', 5, 1, 10), BlockForm::number('days', 30, 0, 365)->helperText(__('admin.homepage.hints.days'))];
     }
 
     public function render(array $options, HomepageContext $context): ?View

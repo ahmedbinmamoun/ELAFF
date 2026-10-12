@@ -11,11 +11,9 @@
 @section('description', $summary->title ?? __('public.issue.description', ['number' => $summary->number, 'date' => $date, 'pages' => $summary->pageCount]))
 @section('canonical', route('issues.show', $summary->number))
 
-@push('head')
-    @if ($issue->socialImagePath)
-        <meta property="og:image" content="{{ url($media::url($issue->socialImagePath)) }}">
-    @endif
-@endpush
+@if ($issue->socialImagePath)
+    @section('og_image', url($media::url($issue->socialImagePath)))
+@endif
 
 @section('content')
     <nav class="mb-3 flex items-center gap-1 text-sm text-muted" aria-label="breadcrumb">

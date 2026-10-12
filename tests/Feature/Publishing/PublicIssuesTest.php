@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\MenusSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Elaf\Content\Domain\Article\Article;
 use Elaf\Content\Domain\Article\IssuePlacement;
@@ -11,6 +12,7 @@ use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Publishing\Domain\Issue\IssueId;
 use Elaf\Publishing\Infrastructure\Persistence\IssueModel;
+use Elaf\Settings\Infrastructure\CachedSettingsReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\Fakes\FrozenClock;
@@ -20,7 +22,7 @@ use Tests\Support\PublicFixtures;
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    $this->seed([RolesAndPermissionsSeeder::class, CategorySeeder::class]);
+    $this->seed([RolesAndPermissionsSeeder::class, CategorySeeder::class, MenusSeeder::class]);
     $this->fx = new PublicFixtures;
     $this->category = (int) CategoryModel::query()->orderBy('sort_order')->value('id');
     $this->author = AuthorModel::query()->create(['name' => 'كاتب', 'slug' => 'katib'])->id;
@@ -136,6 +138,7 @@ it('runs a constant number of queries on the archive pages', function (string $p
     };
     $count = function () use ($path): int {
         $this->app->forgetScopedInstances();
+        cache()->forget(CachedSettingsReader::CACHE_KEY);
         DB::flushQueryLog();
         DB::enableQueryLog();
         $this->get($path)->assertOk();
@@ -152,6 +155,6 @@ it('runs a constant number of queries on the archive pages', function (string $p
 
     expect($after)->toBe($before)->and($before)->toBeLessThanOrEqual($max);
 })->with([
-    'index' => ['/issues', 6],
-    'issue' => ['/issues/5', 10],
+    'index' => ['/issues', 7],
+    'issue' => ['/issues/5', 11],
 ]);
