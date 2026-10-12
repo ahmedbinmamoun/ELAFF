@@ -20,7 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ImportIssuesCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // TLS ends at Cloudflare (tunnel or proxy): follow its X-Forwarded-Proto so
+        // links and signed URLs use https. Only the scheme is trusted; the client
+        // IP is not (rate limits), see Phase 7 for Cloudflare's real-IP header.
+        $middleware->trustProxies(at: '*', headers: Request::HEADER_X_FORWARDED_PROTO);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
