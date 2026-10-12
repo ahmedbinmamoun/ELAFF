@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Elaf\Layout\Presentation;
 
+use Elaf\Layout\Application\Homepage\BlockTypeCatalog;
+use Elaf\Layout\Infrastructure\Persistence\HomepageBlockModel;
 use Elaf\Layout\Infrastructure\Persistence\MenuModel;
+use Elaf\Layout\Presentation\Homepage\Blocks\BreakingTickerBlock;
 use Elaf\Layout\Presentation\Homepage\Blocks\CategorySectionBlock;
 use Elaf\Layout\Presentation\Homepage\Blocks\ColumnistsBlock;
 use Elaf\Layout\Presentation\Homepage\Blocks\CurrentIssueBlock;
@@ -19,6 +22,7 @@ use Elaf\Layout\Presentation\Menus\LinkTypes\PageLink;
 use Elaf\Layout\Presentation\Menus\LinkTypes\UrlLink;
 use Elaf\Layout\Presentation\Menus\MenuLinkRegistry;
 use Elaf\Layout\Presentation\Menus\PublicMenus;
+use Elaf\Layout\Presentation\Policies\HomepageBlockPolicy;
 use Elaf\Layout\Presentation\Policies\MenuPolicy;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Foundation\Application;
@@ -33,6 +37,7 @@ final class LayoutPresentationServiceProvider extends ServiceProvider
      * @var list<class-string<Homepage\HomepageBlockRenderer>>
      */
     public const BLOCKS = [
+        BreakingTickerBlock::class,
         HeroBlock::class,
         LatestArticlesBlock::class,
         MostReadBlock::class,
@@ -53,6 +58,7 @@ final class LayoutPresentationServiceProvider extends ServiceProvider
         $this->app->singleton(HomepageBlockRegistry::class, static fn (Application $app): HomepageBlockRegistry => new HomepageBlockRegistry(
             array_map(static fn (string $class): Homepage\HomepageBlockRenderer => $app->make($class), self::BLOCKS),
         ));
+        $this->app->alias(HomepageBlockRegistry::class, BlockTypeCatalog::class);
         $this->app->singleton(MenuLinkRegistry::class, static fn (Application $app): MenuLinkRegistry => new MenuLinkRegistry(
             array_map(static fn (string $class): Menus\MenuLinkType => $app->make($class), self::MENU_LINKS),
         ));
@@ -62,6 +68,7 @@ final class LayoutPresentationServiceProvider extends ServiceProvider
     public function boot(Gate $gate): void
     {
         $gate->policy(MenuModel::class, MenuPolicy::class);
+        $gate->policy(HomepageBlockModel::class, HomepageBlockPolicy::class);
 
         Route::middleware('web')->get('/', HomeController::class)->name('home');
     }

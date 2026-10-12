@@ -46,6 +46,12 @@ return [
     'invalid_analytics_id' => 'معرّف الإحصاءات غير صالح (مثال: G-ABC123XYZ).',
     'invalid_path' => 'مسار الملف غير صالح.',
 
+    // Homepage
+    'unknown_block_type' => 'نوع الكتلة غير معروف.',
+    'unknown_region' => 'المكان غير صالح.',
+    'invalid_block_option' => 'إعدادات الكتلة غير صالحة.',
+    'stale_block_order' => 'تغيّرت قائمة الكتل في الأثناء، أعد تحميل الصفحة.',
+
     // Menus
     'unknown_menu' => 'القائمة غير معروفة.',
     'menu_too_long' => 'القائمة لا تتسع لأكثر من :max عنصراً.',

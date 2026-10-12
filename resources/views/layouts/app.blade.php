@@ -30,7 +30,10 @@
 <body class="bg-canvas pb-[calc(4rem+env(safe-area-inset-bottom))] font-sans text-ink antialiased md:pb-0">
     <a href="#main" class="skip-link">{{ __('public.skip_to_content') }}</a>
     @include('partials.header')
-    @include('partials.ticker')
+    {{-- On the homepage the ticker is a block (FR-HOME-02 breaking_ticker). --}}
+    @unless (request()->routeIs('home'))
+        @include('partials.ticker')
+    @endunless
     <main id="main" class="mx-auto max-w-site px-gutter py-4 lg:py-6">
         @yield('content')
     </main>

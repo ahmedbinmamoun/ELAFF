@@ -17,6 +17,7 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             RolesAndPermissionsSeeder::class,
             CategorySeeder::class,
+            HomepageBlocksSeeder::class,
         ]);
 
         if (app()->environment('local')) {

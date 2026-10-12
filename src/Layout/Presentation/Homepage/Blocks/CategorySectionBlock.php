@@ -7,8 +7,10 @@ namespace Elaf\Layout\Presentation\Homepage\Blocks;
 use Elaf\Content\Application\Query\ArticleQueries;
 use Elaf\Content\Application\Query\CategoryRef;
 use Elaf\Content\Application\Query\TaxonomyQueries;
+use Elaf\Layout\Presentation\Homepage\ConfigurableBlock;
 use Elaf\Layout\Presentation\Homepage\HomepageBlockRenderer;
 use Elaf\Layout\Presentation\Homepage\HomepageContext;
+use Filament\Forms\Components\Select;
 use Illuminate\Contracts\View\View;
 
 /**
@@ -16,7 +18,7 @@ use Illuminate\Contracts\View\View;
  * (a slug, one section) or "categories" (the first N visible ones), "count".
  * All sections load in one query.
  */
-final readonly class CategorySectionBlock implements HomepageBlockRenderer
+final readonly class CategorySectionBlock implements ConfigurableBlock, HomepageBlockRenderer
 {
     public function __construct(
         private ArticleQueries $articles,
@@ -26,6 +28,26 @@ final readonly class CategorySectionBlock implements HomepageBlockRenderer
     public function type(): string
     {
         return 'category_section';
+    }
+
+    public function label(): string
+    {
+        return BlockForm::label($this->type());
+    }
+
+    public function optionsForm(): array
+    {
+        return [
+            Select::make('options.category')
+                ->label(__('admin.homepage.options.category'))
+                ->helperText(__('admin.homepage.hints.category'))
+                ->options(fn (): array => array_column(array_map(
+                    static fn (CategoryRef $c): array => ['slug' => $c->slug, 'name' => $c->name],
+                    $this->taxonomy->visibleCategories(),
+                ), 'name', 'slug')),
+            BlockForm::number('categories', 4, 1, 12),
+            BlockForm::number('count', 4, 1, 8),
+        ];
     }
 
     public function render(array $options, HomepageContext $context): ?View
