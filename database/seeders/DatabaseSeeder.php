@@ -22,5 +22,8 @@ final class DatabaseSeeder extends Seeder
         if (app()->environment('local')) {
             $this->call([DemoContentSeeder::class, DemoIssuesSeeder::class, DemoPagesSeeder::class]);
         }
+
+        // Last: the footer menu links the pages that exist by now.
+        $this->call(MenusSeeder::class);
     }
 }

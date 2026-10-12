@@ -3,15 +3,16 @@
 declare(strict_types=1);
 
 /*
- * Editorial switches. Read through the EditorialSettings / ContributorSettings
- * ports; the Settings module (Phase 5) moves them into the database.
+ * Installation defaults. Site identity and the contributor switches are
+ * edited in the admin settings (FR-SET-01) and stored in the database.
  */
 return [
     /*
-     * Site identity shown in the header and footer. Empty values are not
-     * rendered. Moves to the settings table in Phase 5 (FR-SET-01).
+     * Default site identity for a fresh installation. The admin's settings
+     * page (FR-SET-01) overrides every value; empty values are not rendered.
      */
     'site' => [
+        'name' => env('ELAF_SITE_NAME', 'إيلاف'),
         'logo_suffix' => env('ELAF_LOGO_SUFFIX', 'السودان'),
         'motto' => env('ELAF_MOTTO', 'كلمة تبني وطنا'),
         'description' => env('ELAF_DESCRIPTION', 'صحيفة للاقتصاد السياسي السوداني ومحيطه'),
@@ -26,12 +27,6 @@ return [
             'whatsapp' => env('ELAF_WHATSAPP_CHANNEL_URL'),
             'youtube' => env('ELAF_YOUTUBE_URL'),
             'x' => env('ELAF_X_URL'),
-        ],
-        // Footer links; pages arrive with FR-PAG-01 (Phase 5).
-        'footer_links' => [
-            ['label' => 'عن الصحيفة', 'url' => '/page/about'],
-            ['label' => 'اتصل بنا', 'url' => '/page/contact'],
-            ['label' => 'سياسة الخصوصية', 'url' => '/page/privacy'],
         ],
     ],
 

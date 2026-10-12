@@ -1,9 +1,8 @@
 @php
     $navLimit = 7;
-    $primary = array_slice($navigation, 0, $navLimit);
-    $more = array_slice($navigation, $navLimit);
+    $primary = array_slice($menus['header'] ?? [], 0, $navLimit);
+    $more = array_slice($menus['header'] ?? [], $navLimit);
     $isHome = request()->routeIs('home');
-    $currentSlug = request()->route('slug');
 @endphp
 <header x-data="{ drawer: false, search: false }" x-on:keydown.escape.window="drawer = false; search = false" class="bg-paper">
     {{-- Desktop: date and social row --}}
@@ -78,8 +77,22 @@
             <ul class="nav-scroll flex min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-sm font-semibold">
                 <li><a href="{{ route('home') }}" class="flex h-12 items-center px-4 {{ $isHome ? 'bg-accent' : 'hover:bg-brand-light' }}" @if ($isHome) aria-current="page" @endif>{{ __('public.home') }}</a></li>
                 @foreach ($primary as $item)
-                    @php($active = $currentSlug === $item->slug && request()->routeIs('category.show'))
-                    <li><a href="{{ route('category.show', $item->slug) }}" class="flex h-12 items-center px-4 {{ $active ? 'bg-accent' : 'hover:bg-brand-light' }}" @if ($active) aria-current="page" @endif>{{ $item->name }}</a></li>
+                    @if ($item->children === [])
+                        <li><a href="{{ $item->url }}" class="flex h-12 items-center px-4 {{ $item->active ? 'bg-accent' : 'hover:bg-brand-light' }}" @if ($item->active) aria-current="page" @endif @if ($item->external) rel="noopener" @endif>{{ $item->label }}</a></li>
+                    @else
+                        {{-- One level of sub-items (FR-NAV-01). --}}
+                        <li class="relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
+                            <button type="button" class="flex h-12 items-center gap-1 px-4 {{ $item->active ? 'bg-accent' : 'hover:bg-brand-light' }}" x-on:click="open = !open" x-bind:aria-expanded="open.toString()" aria-expanded="false" aria-haspopup="true">
+                                {{ $item->label }} <x-svg-icon name="chevron-down" class="h-4 w-4" />
+                            </button>
+                            <ul class="fixed z-30 mt-0 w-52 rounded-b-card bg-paper py-1 text-ink shadow-lg" x-show="open" x-cloak x-transition.opacity>
+                                <li><a href="{{ $item->url }}" class="flex min-h-tap items-center px-4 font-semibold hover:bg-canvas">{{ $item->label }}</a></li>
+                                @foreach ($item->children as $child)
+                                    <li><a href="{{ $child->url }}" class="flex min-h-tap items-center px-4 hover:bg-canvas" @if ($child->external) rel="noopener" @endif>{{ $child->label }}</a></li>
+                                @endforeach
+                            </ul>
+                        </li>
+                    @endif
                 @endforeach
             </ul>
             @if ($more !== [])
@@ -89,8 +102,11 @@
                     </button>
                     <ul class="absolute end-0 top-full z-30 w-52 rounded-b-card bg-paper py-1 text-ink shadow-lg" x-show="open" x-cloak x-transition.opacity>
                         @foreach ($more as $item)
-                            <li><a href="{{ route('category.show', $item->slug) }}" class="flex min-h-tap items-center gap-2 px-4 hover:bg-canvas">
-                                @if ($item->icon)<x-svg-icon :name="$item->icon" class="h-5 w-5 text-brand" />@endif{{ $item->name }}</a></li>
+                            <li><a href="{{ $item->url }}" class="flex min-h-tap items-center gap-2 px-4 hover:bg-canvas" @if ($item->external) rel="noopener" @endif>
+                                @if ($item->icon)<x-svg-icon :name="$item->icon" class="h-5 w-5 text-brand" />@endif{{ $item->label }}</a></li>
+                            @foreach ($item->children as $child)
+                                <li><a href="{{ $child->url }}" class="flex min-h-tap items-center px-4 ps-11 text-sm hover:bg-canvas" @if ($child->external) rel="noopener" @endif>{{ $child->label }}</a></li>
+                            @endforeach
                         @endforeach
                     </ul>
                 </div>
@@ -115,9 +131,12 @@
             </div>
             <ul class="py-2">
                 <li><a href="{{ route('home') }}" class="flex min-h-tap items-center gap-3 px-4 font-semibold hover:bg-canvas"><x-svg-icon name="home" class="h-5 w-5 text-brand" />{{ __('public.home') }}</a></li>
-                @foreach ($navigation as $item)
-                    <li><a href="{{ route('category.show', $item->slug) }}" class="flex min-h-tap items-center gap-3 px-4 hover:bg-canvas">
-                        <x-svg-icon :name="$item->icon ?? 'grid'" class="h-5 w-5 text-brand" />{{ $item->name }}</a></li>
+                @foreach ($menus['sections'] ?? [] as $item)
+                    <li><a href="{{ $item->url }}" class="flex min-h-tap items-center gap-3 px-4 hover:bg-canvas {{ $item->active ? 'font-bold text-accent' : '' }}" @if ($item->external) rel="noopener" @endif>
+                        <x-svg-icon :name="$item->icon ?? 'grid'" class="h-5 w-5 text-brand" />{{ $item->label }}</a></li>
+                    @foreach ($item->children as $child)
+                        <li><a href="{{ $child->url }}" class="flex min-h-tap items-center px-4 ps-12 text-sm hover:bg-canvas" @if ($child->external) rel="noopener" @endif>{{ $child->label }}</a></li>
+                    @endforeach
                 @endforeach
             </ul>
             <ul class="border-t border-rule py-2 text-sm">

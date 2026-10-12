@@ -9,6 +9,7 @@ use Elaf\Content\Application\ContentPermission;
 use Elaf\Contributors\Application\ContributorPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
+use Elaf\Layout\Application\LayoutPermission;
 use Elaf\Publishing\Application\IssuePermission;
 use Elaf\Settings\Application\SettingsPermission;
 use Illuminate\Database\Seeder;
@@ -28,7 +29,7 @@ final class RolesAndPermissionsSeeder extends Seeder
      */
     public static function permissions(): array
     {
-        return [...ContentPermission::cases(), ...ContributorPermission::cases(), ...IdentityPermission::cases(), ...IssuePermission::cases(), ...SettingsPermission::cases()];
+        return [...ContentPermission::cases(), ...ContributorPermission::cases(), ...IdentityPermission::cases(), ...IssuePermission::cases(), ...SettingsPermission::cases(), ...LayoutPermission::cases()];
     }
 
     /**
@@ -45,7 +46,8 @@ final class RolesAndPermissionsSeeder extends Seeder
             ContentPermission::ManageAuthors,
             ContributorPermission::ManageContributors,
         ];
-        $editorInChief = [...$editor, ContentPermission::PublishArticles, ContentPermission::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages];
+        $editorInChief = [...$editor, ContentPermission::PublishArticles, ContentPermission::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages,
+            LayoutPermission::ManageHomepage, LayoutPermission::ManageMenus, LayoutPermission::ManageAds];
 
         return [
             Role::Writer->value => $writer,

@@ -46,6 +46,15 @@ return [
     'invalid_analytics_id' => 'معرّف الإحصاءات غير صالح (مثال: G-ABC123XYZ).',
     'invalid_path' => 'مسار الملف غير صالح.',
 
+    // Menus
+    'unknown_menu' => 'القائمة غير معروفة.',
+    'menu_too_long' => 'القائمة لا تتسع لأكثر من :max عنصراً.',
+    'menu_too_deep' => 'العنصر :position: القوائم تقبل مستوى واحداً من العناصر الفرعية.',
+    'menu_item_label' => 'العنصر :position: النص مطلوب ولا يتجاوز 60 حرفاً.',
+    'menu_item_type' => 'العنصر :position: نوع الرابط غير صالح.',
+    'menu_item_target' => 'العنصر :position: القسم أو الصفحة المختارة غير موجودة.',
+    'menu_item_url' => 'العنصر :position: الرابط يجب أن يبدأ بـ / أو http(s)://.',
+
     // Print issues
     'issue_number_taken' => 'العدد رقم :number موجود بالفعل.',
     'number_not_positive' => 'رقم العدد يجب أن يكون 1 أو أكثر.',

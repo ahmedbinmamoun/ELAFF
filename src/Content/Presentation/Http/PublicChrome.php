@@ -6,13 +6,11 @@ namespace Elaf\Content\Presentation\Http;
 
 use Elaf\Content\Application\Query\ArticleLink;
 use Elaf\Content\Application\Query\ArticleQueries;
-use Elaf\Content\Application\Query\CategoryRef;
-use Elaf\Content\Application\Query\TaxonomyQueries;
+use Elaf\Layout\Presentation\Menus\PublicMenus;
 use Elaf\Settings\Application\Site\SettingsReader;
 use Elaf\Shared\Domain\Time\Clock;
 use Elaf\Shared\Presentation\ArabicDate;
 use Elaf\Shared\Presentation\PublicMedia;
-use Illuminate\Contracts\Config\Repository;
 
 /**
  * Data every public page shows (header, ticker, footer), loaded at most once
@@ -24,11 +22,10 @@ final class PublicChrome
     private ?array $data = null;
 
     public function __construct(
-        private readonly TaxonomyQueries $taxonomy,
         private readonly ArticleQueries $articles,
         private readonly Clock $clock,
-        private readonly Repository $config,
         private readonly SettingsReader $settings,
+        private readonly PublicMenus $menus,
     ) {}
 
     /**
@@ -38,19 +35,11 @@ final class PublicChrome
     {
         return $this->data ??= [
             'site' => $this->site(),
-            'navigation' => $this->navigation(),
+            'menus' => $this->menus->all(),
             'breaking' => $this->breaking(),
             'today' => ArabicDate::withWeekday($this->clock->now()),
             'year' => $this->clock->now()->format('Y'),
         ];
-    }
-
-    /**
-     * @return list<CategoryRef>
-     */
-    private function navigation(): array
-    {
-        return $this->taxonomy->visibleCategories();
     }
 
     /**
@@ -69,7 +58,6 @@ final class PublicChrome
     private function site(): array
     {
         $s = $this->settings->site();
-        $footerLinks = $this->config->get('elaf.site.footer_links');
 
         return [
             'name' => $s->name,
@@ -95,7 +83,6 @@ final class PublicChrome
                 'youtube' => $s->youtubeUrl,
                 'x' => $s->xUrl,
             ],
-            'footer_links' => is_array($footerLinks) ? $footerLinks : [],
         ];
     }
 }

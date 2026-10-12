@@ -13,7 +13,7 @@ use Elaf\Shared\Application\Validation\RecordNotFound;
 use Elaf\Shared\Domain\Time\Clock;
 
 /**
- * Menu items pointing at the page are removed with it (database cascade).
+ * Menu items pointing at the page stop showing (the menu query drops them).
  */
 final readonly class DeletePageHandler
 {

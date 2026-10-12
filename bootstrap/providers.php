@@ -10,6 +10,7 @@ use Elaf\Contributors\Presentation\ContributorsPresentationServiceProvider;
 use Elaf\Contributors\Presentation\Filament\WriterPanelProvider;
 use Elaf\Identity\Infrastructure\IdentityServiceProvider;
 use Elaf\Identity\Presentation\IdentityPresentationServiceProvider;
+use Elaf\Layout\Infrastructure\LayoutServiceProvider;
 use Elaf\Layout\Presentation\LayoutPresentationServiceProvider;
 use Elaf\Publishing\Infrastructure\PublishingServiceProvider;
 use Elaf\Publishing\Presentation\PublishingPresentationServiceProvider;
@@ -27,6 +28,7 @@ return [
     IdentityServiceProvider::class,
     ContributorsServiceProvider::class,
     PublishingServiceProvider::class,
+    LayoutServiceProvider::class,
     ContentPresentationServiceProvider::class,
     IdentityPresentationServiceProvider::class,
     ContributorsPresentationServiceProvider::class,

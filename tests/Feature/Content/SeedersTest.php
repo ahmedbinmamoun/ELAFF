@@ -14,6 +14,7 @@ use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Contributors\Application\ContributorPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
+use Elaf\Layout\Application\LayoutPermission;
 use Elaf\Publishing\Application\IssuePermission;
 use Elaf\Settings\Application\SettingsPermission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,8 +34,8 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
     'writer' => [Role::Writer, [P::CreateArticles]],
     'contributor' => [Role::Contributor, [P::CreateArticles]],
     'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors]],
-    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, P::PublishArticles, P::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages]],
-    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers, IssuePermission::ManageIssues, ...SettingsPermission::cases()]],
+    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, P::PublishArticles, P::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages, LayoutPermission::ManageHomepage, LayoutPermission::ManageMenus, LayoutPermission::ManageAds]],
+    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers, IssuePermission::ManageIssues, ...SettingsPermission::cases(), ...LayoutPermission::cases()]],
 ]);
 
 it('seeds the website sections with icons once, without overwriting edits (FR-TAX-01)', function (): void {

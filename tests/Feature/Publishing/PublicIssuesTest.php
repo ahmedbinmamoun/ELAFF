@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Database\Seeders\CategorySeeder;
+use Database\Seeders\MenusSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Elaf\Content\Domain\Article\Article;
 use Elaf\Content\Domain\Article\IssuePlacement;
@@ -21,7 +22,7 @@ use Tests\Support\PublicFixtures;
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
-    $this->seed([RolesAndPermissionsSeeder::class, CategorySeeder::class]);
+    $this->seed([RolesAndPermissionsSeeder::class, CategorySeeder::class, MenusSeeder::class]);
     $this->fx = new PublicFixtures;
     $this->category = (int) CategoryModel::query()->orderBy('sort_order')->value('id');
     $this->author = AuthorModel::query()->create(['name' => 'كاتب', 'slug' => 'katib'])->id;
