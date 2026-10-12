@@ -14,7 +14,9 @@ use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Content\Infrastructure\Persistence\Models\SeriesModel;
 use Elaf\Content\Infrastructure\Persistence\Models\TagModel;
 use Elaf\Identity\Domain\UserId;
+use Elaf\Publishing\Domain\Issue\IssueId;
 use Illuminate\Support\Facades\DB;
+use Tests\Support\IssueFixtures;
 
 final class EloquentContentFixtures implements ContentFixtures
 {
@@ -78,5 +80,10 @@ final class EloquentContentFixtures implements ContentFixtures
         $n = ++$this->next;
 
         return SeriesId::fromInt(SeriesModel::query()->create(['title' => "سلسلة {$n}", 'slug' => "series-{$n}"])->id);
+    }
+
+    public function issue(): IssueId
+    {
+        return IssueId::fromInt(IssueFixtures::pending(++$this->next)->id);
     }
 }

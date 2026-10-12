@@ -24,5 +24,6 @@ final readonly class ArticleDetail
         public ?string $seoTitle,
         public ?string $seoDescription,
         public ?string $canonicalUrl,
+        public ?PrintRef $print = null,
     ) {}
 }
