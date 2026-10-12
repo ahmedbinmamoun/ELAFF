@@ -39,6 +39,16 @@ Other targets: `make help`.
   `--csv=map.csv` with the columns `file,number,date,title`. Drop `--dry-run`
   to import; re-running skips numbers that already exist.
 
+## Running the site (admin)
+- **Settings** (Admin): name, logo, contacts, social links, masthead,
+  analytics, contributor switches. The values in `.env` are only defaults.
+- **Homepage**, **Menus**, **Ads**, **Static pages** (Editor-in-Chief and
+  Admin): arrange homepage blocks by drag and drop, edit the header,
+  sections and footer menus, schedule ads in five slots, write the about /
+  contact / privacy pages.
+- **Reader letters** (editors): letters sent from `/letters` wait for
+  moderation; an approved letter can become a draft article.
+
 ## Frontend
 `make up` starts Vite with hot reload. To see production assets (e.g. for
 Lighthouse), run `docker compose exec vite npm run build`, stop the `vite`

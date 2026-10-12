@@ -64,3 +64,37 @@ database is never refreshed while staging runs.
 ## Out of scope
 Search, SEO metadata/sitemaps, caching decorators for articles (Phase 6);
 CSP for ad HTML and analytics (Phase 7); newsletter (Phase 8).
+
+## Result (2026-10-14)
+
+All five slices built and tested (755 tests, MySQL; Larastan max clean):
+
+1. **Settings + pages**: admin settings page (identity, logo, favicon, OG
+   image, contacts, social links, masthead, footer text, analytics id,
+   contributor switches), cached with invalidation on change; static pages
+   with `/page/{slug}`.
+2. **Menus**: header, sections, footer; nested reorderable editor; public
+   header (with sub-item dropdowns), drawer, sections list and footer read
+   them.
+3. **Homepage blocks**: drag-and-drop list, show/hide, per-type options
+   forms; new types `breaking_ticker` and `ad_slot`; FR-HOME-03 shown with a
+   test that registers an anonymous block class.
+4. **Ads**: five slots, image or HTML, schedule, weight, click redirect,
+   placements in header, footer, article sidebar, inside the article and
+   between homepage sections.
+5. **Reader letters**: `/letters` form with honeypot, rate limit and
+   captcha; moderation queue with a pending badge; approve, reject with
+   reason, convert to a draft in "بريد القراء".
+
+### Checks
+- No horizontal overflow at 360/412 px on home, article, letters, page.
+- Accessibility 100 and SEO 100 on home, article, letters. A "most read"
+  title link was below the 24 px target size; fixed.
+- Performance could not be measured cleanly: the machine was loaded
+  (Lighthouse CPU benchmark 550–890, normally well above 1000) and the
+  same page swung between 69 and 98. Same-moment medians: Phase 4 build 93,
+  Phase 5 build 88 on the homepage; article 90, letters 90. The JS bundle
+  is byte-identical to Phase 4 and the DOM size is unchanged (772 vs 778
+  nodes). **To re-measure on a quiet machine in Phase 6**, together with
+  the caching work.
+- Phase 4 acceptance re-checked: a 24-page PDF rendered in 38 s.

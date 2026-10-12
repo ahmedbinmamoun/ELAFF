@@ -5,7 +5,7 @@
             <li class="flex gap-3 py-3">
                 <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-badge bg-accent text-sm font-bold text-white">{{ $loop->iteration }}</span>
                 <div class="min-w-0">
-                    <a href="{{ route('article.show', ['id' => $card->id, 'slug' => $card->slug]) }}" class="line-clamp-2 font-bold leading-snug hover:text-accent">{{ $card->title }}</a>
+                    <a href="{{ route('article.show', ['id' => $card->id, 'slug' => $card->slug]) }}" class="line-clamp-2 min-h-6 font-bold leading-6 hover:text-accent">{{ $card->title }}</a>
                     <x-date :at="$card->publishedAt" class="mt-1" />
                 </div>
             </li>
