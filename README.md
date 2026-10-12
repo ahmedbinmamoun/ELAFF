@@ -29,10 +29,21 @@ Other targets: `make help`.
 - The scheduler publishes scheduled articles every minute
   (`php artisan articles:publish-scheduled`).
 
+## Print issues
+- Upload in the admin (Issues, Editor-in-Chief and Admin). The `queue` service
+  renders the pages (poppler + Imagick); a failure shows its reason with a
+  retry button. Demo data includes six generated issues.
+- Back-fill an archive folder:
+  `docker compose exec app php artisan issues:import /path/to/pdfs --first-number=1 --dry-run`
+  (numbers counted up in date order from names like `إيلاف_8_10_2026.pdf`), or
+  `--csv=map.csv` with the columns `file,number,date,title`. Drop `--dry-run`
+  to import; re-running skips numbers that already exist.
+
 ## Frontend
 `make up` starts Vite with hot reload. To see production assets (e.g. for
 Lighthouse), run `docker compose exec vite npm run build`, stop the `vite`
-service and delete `public/hot`.
+service and delete `public/hot`. Give headless Chromium containers
+`--shm-size=1g`: with Docker's default 64 MB the tab crashes on long pages.
 
 ## Without Docker
 PHP 8.3 + Composer: `composer install && composer check` (tests use SQLite in memory).

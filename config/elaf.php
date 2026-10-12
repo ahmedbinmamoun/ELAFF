@@ -44,6 +44,13 @@ return [
         'حوار', 'رأي اقتصادي', 'رأي سياسي', 'من صحافة العالم', 'بريد القراء', 'أخيرة',
     ],
 
+    /*
+     * Print issues (PRD §11). PDFs and page images are public files.
+     */
+    'issues' => [
+        'disk' => env('ELAF_ISSUES_DISK', 'public'),
+    ],
+
     'contributors' => [
         'require_account_approval' => (bool) env('ELAF_CONTRIBUTORS_REQUIRE_ACCOUNT_APPROVAL', true),
         'editor_can_publish' => (bool) env('ELAF_CONTRIBUTORS_EDITOR_CAN_PUBLISH', false),

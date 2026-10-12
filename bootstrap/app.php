@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Elaf\Content\Presentation\Console\PublishScheduledArticlesCommand;
+use Elaf\Publishing\Presentation\Console\ImportIssuesCommand;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands([
         PublishScheduledArticlesCommand::class,
+        ImportIssuesCommand::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         //

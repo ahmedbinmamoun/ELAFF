@@ -75,6 +75,14 @@
                 @endif
             </p>
 
+            @if ($article->print)
+                <a href="{{ route('issues.show', $article->print->issueNumber) }}#page-{{ $article->print->page }}"
+                   class="mt-3 flex min-h-tap items-center gap-2 rounded-card bg-canvas px-3 text-sm font-semibold text-brand hover:text-accent">
+                    <x-svg-icon name="newspaper" class="h-5 w-5 shrink-0 text-accent" />
+                    {{ __('public.issue.printed_in', ['number' => $article->print->issueNumber, 'page' => $article->print->page]) }}
+                </a>
+            @endif
+
             @if ($article->series)
                 @php($series = $article->series)
                 <nav class="mt-6 rounded-card bg-canvas p-4" aria-label="{{ __('public.series_title', ['name' => $series->title]) }}">

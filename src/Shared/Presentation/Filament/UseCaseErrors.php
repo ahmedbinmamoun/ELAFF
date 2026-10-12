@@ -9,6 +9,8 @@ use Elaf\Content\Domain\Article\Exception\ArticleWorkflowViolation;
 use Elaf\Content\Domain\Article\Exception\IllegalArticleTransition;
 use Elaf\Contributors\Domain\Exception\ContributorRuleViolation;
 use Elaf\Contributors\Domain\Exception\IllegalContributorTransition;
+use Elaf\Publishing\Domain\Issue\Exception\IllegalIssueTransition;
+use Elaf\Publishing\Domain\Issue\Exception\InvalidIssue;
 use Elaf\Shared\Application\Authorization\NotAuthorized;
 use Elaf\Shared\Application\Validation\InvalidInput;
 use Elaf\Shared\Application\Validation\RecordNotFound;
@@ -77,6 +79,8 @@ final class UseCaseErrors
             ]),
             $e instanceof ContributorRuleViolation => self::translate($e->reason),
             $e instanceof IllegalContributorTransition => self::translate('illegal_contributor_transition'),
+            $e instanceof IllegalIssueTransition => self::translate('illegal_issue_transition'),
+            $e instanceof InvalidIssue => self::translate($e->reason),
             $e instanceof NotAuthorized => self::translate('not_authorized'),
             $e instanceof RecordNotFound => self::translate('not_found'),
             default => self::translate('failed'),

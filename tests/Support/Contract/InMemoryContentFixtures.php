@@ -9,6 +9,7 @@ use Elaf\Content\Domain\Category\CategoryId;
 use Elaf\Content\Domain\Series\SeriesId;
 use Elaf\Content\Domain\Tag\TagId;
 use Elaf\Identity\Domain\UserId;
+use Elaf\Publishing\Domain\Issue\IssueId;
 use LogicException;
 
 final class InMemoryContentFixtures implements ContentFixtures
@@ -38,6 +39,11 @@ final class InMemoryContentFixtures implements ContentFixtures
     public function series(): SeriesId
     {
         return SeriesId::fromInt(++$this->next);
+    }
+
+    public function issue(): IssueId
+    {
+        return IssueId::fromInt(++$this->next);
     }
 
     public function useInArticle(object $repository, CategoryId|AuthorId|SeriesId $id): void

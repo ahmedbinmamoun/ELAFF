@@ -11,6 +11,7 @@ use Elaf\Content\Presentation\Filament\Resources\Series\SeriesResource;
 use Elaf\Content\Presentation\Filament\Resources\Tags\TagResource;
 use Elaf\Contributors\Presentation\Filament\Admin\Contributors\ContributorResource;
 use Elaf\Identity\Presentation\Filament\Resources\Users\UserResource;
+use Elaf\Publishing\Presentation\Filament\Issues\IssueResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -49,6 +50,7 @@ final class AdminPanelProvider extends PanelProvider
             ])
             ->resources([
                 ArticleResource::class,
+                IssueResource::class,
                 ContributorResource::class,
                 CategoryResource::class,
                 TagResource::class,

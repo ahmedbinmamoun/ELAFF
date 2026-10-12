@@ -9,6 +9,7 @@ use Elaf\Content\Domain\Category\CategoryId;
 use Elaf\Content\Domain\Series\SeriesId;
 use Elaf\Content\Domain\Tag\TagId;
 use Elaf\Identity\Domain\UserId;
+use Elaf\Publishing\Domain\Issue\IssueId;
 
 /**
  * Referenced records for repository contract tests: real rows for the
@@ -25,6 +26,8 @@ interface ContentFixtures
     public function tag(): TagId;
 
     public function series(): SeriesId;
+
+    public function issue(): IssueId;
 
     /**
      * Makes an article reference $id, for "in use" checks. $repository is

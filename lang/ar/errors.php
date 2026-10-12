@@ -42,6 +42,17 @@ return [
     'no_pending_name_change' => 'لا يوجد طلب تغيير اسم.',
     'illegal_contributor_transition' => 'لا يمكن تنفيذ هذا الإجراء على الحساب في حالته الحالية.',
 
+    // Print issues
+    'issue_number_taken' => 'العدد رقم :number موجود بالفعل.',
+    'number_not_positive' => 'رقم العدد يجب أن يكون 1 أو أكثر.',
+    'invalid_date' => 'التاريخ غير صالح.',
+    'not_pdf' => 'الملف المرفوع ليس ملف PDF.',
+    'file_too_large' => 'حجم الملف أكبر من :max ميغابايت.',
+    'issue_has_articles' => 'لا يمكن حذف عدد مرتبط بـ :count مقالاً. ألغِ ربطها أولاً.',
+    'page_not_positive' => 'رقم الصفحة يجب أن يكون 1 أو أكثر.',
+    'page_beyond_issue' => 'العدد :number فيه :pages صفحة فقط.',
+    'illegal_issue_transition' => 'لا يمكن تنفيذ هذا الإجراء على العدد في حالته الحالية.',
+
     // Article workflow
     'own_article_approval' => 'لا يمكنك اعتماد مقال كتبته بنفسك.',
     'return_note_required' => 'اكتب ملاحظة للكاتب عند إعادة المقال.',

@@ -1,0 +1,7 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Elaf\Publishing\Domain\Issue\Events;
+
+final readonly class IssueProcessed extends IssueEvent {}

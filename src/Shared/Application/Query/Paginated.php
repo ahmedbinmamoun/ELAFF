@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Elaf\Content\Application\Query;
+namespace Elaf\Shared\Application\Query;
 
 /**
  * @template T

@@ -12,13 +12,15 @@ use Elaf\Content\Application\Query\ArticleQueries;
 use Elaf\Content\Application\Query\AuthorRef;
 use Elaf\Content\Application\Query\CategorySection;
 use Elaf\Content\Application\Query\ColumnistItem;
-use Elaf\Content\Application\Query\Paginated;
+use Elaf\Content\Application\Query\PrintRef;
 use Elaf\Content\Application\Query\SeriesNavigation;
 use Elaf\Content\Application\Query\TagRef;
 use Elaf\Content\Domain\Article\ArticleStatus;
 use Elaf\Content\Infrastructure\Persistence\Eloquent\LocalTime;
+use Elaf\Shared\Application\Query\Paginated;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 use stdClass;
 
 final readonly class EloquentArticleQueries implements ArticleQueries
@@ -31,9 +33,11 @@ final readonly class EloquentArticleQueries implements ArticleQueries
     public function detail(int $articleId): ?ArticleDetail
     {
         $row = $this->cards->published()
+            ->leftJoin('issues as i', static fn (JoinClause $join) => $join->on('i.id', '=', 'a.issue_id')->where('i.processing_status', 'ready'))
             ->where('a.id', $articleId)
             ->first([...ArticleCardHydrator::CARD_COLUMNS, 'a.subtitle', 'a.dateline', 'a.body', 'a.source_name', 'a.source_url',
-                'a.series_id', 'a.series_part', 'a.updated_at', 'a.seo_title', 'a.seo_description', 'a.canonical_url']);
+                'a.series_id', 'a.series_part', 'a.updated_at', 'a.seo_title', 'a.seo_description', 'a.canonical_url',
+                'i.number as issue_number', 'a.issue_page']);
 
         if (! $row instanceof stdClass) {
             return null;
@@ -64,6 +68,9 @@ final readonly class EloquentArticleQueries implements ArticleQueries
             seoTitle: ArticleCardHydrator::nullable($row, 'seo_title'),
             seoDescription: ArticleCardHydrator::nullable($row, 'seo_description'),
             canonicalUrl: ArticleCardHydrator::nullable($row, 'canonical_url'),
+            print: is_numeric($row->issue_number ?? null) && is_numeric($row->issue_page ?? null)
+                ? new PrintRef((int) $row->issue_number, (int) $row->issue_page)
+                : null,
         );
     }
 

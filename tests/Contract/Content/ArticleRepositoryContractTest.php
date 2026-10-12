@@ -16,7 +16,6 @@ use Elaf\Content\Domain\Article\IssuePlacement;
 use Elaf\Content\Domain\Article\SeriesPlacement;
 use Elaf\Content\Domain\Article\Title;
 use Elaf\Content\Infrastructure\Persistence\Eloquent\EloquentArticleRepository;
-use Elaf\Publishing\Domain\Issue\IssueId;
 use Elaf\Shared\Domain\Text\Slug;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\Contract\ArticleState;
@@ -77,7 +76,7 @@ function contract_article(ArticleRepository $repository, ContentFixtures $fx, Fr
         $article->publish($editor, $clock);
         $article->markBreaking($clock->now()->modify('+6 hours'), $editor, $clock);
         $article->promote(true, 4, $editor, $clock);
-        $article->assignToIssue(new IssuePlacement(IssueId::fromInt(12), 3), $editor, $clock);
+        $article->assignToIssue(new IssuePlacement($fx->issue(), 3), $editor, $clock);
     }
 
     return $article;
