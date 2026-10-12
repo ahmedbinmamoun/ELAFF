@@ -8,6 +8,7 @@ use Elaf\Content\Application\Article\ArticleCounts;
 use Elaf\Content\Application\Article\ArticleInput;
 use Elaf\Content\Application\Article\DueScheduledArticles;
 use Elaf\Content\Application\Article\EditorialSettings;
+use Elaf\Content\Application\Article\PrintIssues;
 use Elaf\Content\Application\Article\Revision\ArticleRevisions;
 use Elaf\Content\Application\Author\AuthorData;
 use Elaf\Content\Application\Author\AuthorRepository;
@@ -41,6 +42,7 @@ use ReflectionNamedType;
 use Tests\Support\Fakes\FakeCaptchaVerifier;
 use Tests\Support\Fakes\FakeEditorialSettings;
 use Tests\Support\Fakes\FakePasswordHasher;
+use Tests\Support\Fakes\FakePrintIssues;
 use Tests\Support\Fakes\FrozenClock;
 use Tests\Support\Fakes\ImmediateTransaction;
 use Tests\Support\Fakes\InMemoryArticleRepository;
@@ -91,6 +93,8 @@ final class ContentKit
 
     public readonly InMemoryRoleAssignments $roles;
 
+    public readonly FakePrintIssues $printIssues;
+
     /** @var array<class-string, object> */
     private array $bindings;
 
@@ -111,6 +115,7 @@ final class ContentKit
         $this->settings = new FakeEditorialSettings;
         $this->contributors = new InMemoryContributors;
         $this->roles = new InMemoryRoleAssignments;
+        $this->printIssues = new FakePrintIssues;
 
         $this->bindings = [
             Clock::class => $this->clock,
@@ -135,6 +140,7 @@ final class ContentKit
             ContributorAccounts::class => $this->contributors,
             RoleAssignments::class => $this->roles,
             CaptchaVerifier::class => new FakeCaptchaVerifier,
+            PrintIssues::class => $this->printIssues,
         ];
         $this->bindings[AuthorProfiles::class] = new ContentAuthorProfiles($this->authors);
     }
