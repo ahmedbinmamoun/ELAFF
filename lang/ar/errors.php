@@ -52,6 +52,18 @@ return [
     'invalid_block_option' => 'إعدادات الكتلة غير صالحة.',
     'stale_block_order' => 'تغيّرت قائمة الكتل في الأثناء، أعد تحميل الصفحة.',
 
+    // Ads
+    'unknown_ad_slot' => 'مكان الإعلان غير صالح.',
+    'ad_creative_required' => 'ارفع صورة أو أضف كود HTML.',
+    'ad_title' => 'العنوان مطلوب ولا يتجاوز 150 حرفاً.',
+    'ad_target_required' => 'إعلان الصورة يحتاج رابط وجهة.',
+    'ad_target_invalid' => 'رابط الوجهة يجب أن يبدأ بـ http أو https.',
+    'ad_weight' => 'الوزن من 1 إلى 100.',
+    'ad_schedule_order' => 'يجب أن ينتهي الإعلان بعد بدايته.',
+    'ad_image_invalid' => 'الصورة غير صالحة.',
+    'ad_html_empty' => 'كود HTML فارغ.',
+    'ad_html_too_long' => 'كود HTML أطول من المسموح.',
+
     // Menus
     'unknown_menu' => 'القائمة غير معروفة.',
     'menu_too_long' => 'القائمة لا تتسع لأكثر من :max عنصراً.',

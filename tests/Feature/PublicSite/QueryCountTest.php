@@ -18,7 +18,7 @@ uses(RefreshDatabase::class);
 
 /*
  * Phase 3 acceptance: no N+1. Every page also pays a fixed cost for the
- * settings (one query, then cached) and
+ * settings (one query, then cached), the active ads (one query) and
  * header (sections, breaking ticker) and, on listings, the "most read" aside. Each key page runs a fixed number of queries,
  * the same with twice as much content.
  */
@@ -85,9 +85,9 @@ it('runs a constant, small number of queries per page', function (string $page, 
 })->with([
     'home' => ['home', 16],
     'article' => ['article', 12],
-    'category' => ['category', 9],
-    'author' => ['author', 9],
-    'tag' => ['tag', 9],
-    'series' => ['series', 6],
+    'category' => ['category', 10],
+    'author' => ['author', 10],
+    'tag' => ['tag', 10],
+    'series' => ['series', 7],
     'feed' => ['feed', 4],
 ]);

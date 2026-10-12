@@ -14,7 +14,7 @@
         <a href="{{ route('category.show', $card->category->slug) }}" class="font-semibold text-brand">{{ $card->category->name }}</a>
     </nav>
 
-    <x-with-aside :most-read="$mostRead">
+    <x-with-aside :most-read="$mostRead" ad="article_sidebar">
         <article class="rounded-card border border-rule bg-paper p-4 sm:p-6">
             <header>
                 <div class="flex flex-wrap gap-2">
@@ -62,9 +62,16 @@
 
             <div class="mt-5">@include('partials.share-bar', ['url' => $url, 'title' => $card->title])</div>
 
+            @php([$bodyStart, $bodyRest] = \Elaf\Layout\Presentation\Ads\ArticleBodySplitter::split($article->bodyHtml))
             <div class="article-body mt-6" x-ignore>
-                {!! $article->bodyHtml !!}
+                {!! $bodyStart !!}
             </div>
+            @if ($bodyRest !== '')
+                <x-ad-slot place="article_inline" class="my-6" />
+                <div class="article-body" x-ignore>
+                    {!! $bodyRest !!}
+                </div>
+            @endif
 
             <p class="mt-6 text-sm text-muted">
                 {{ __('public.source') }}:

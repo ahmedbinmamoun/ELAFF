@@ -11,6 +11,7 @@ use Elaf\Content\Presentation\Filament\Resources\Series\SeriesResource;
 use Elaf\Content\Presentation\Filament\Resources\Tags\TagResource;
 use Elaf\Contributors\Presentation\Filament\Admin\Contributors\ContributorResource;
 use Elaf\Identity\Presentation\Filament\Resources\Users\UserResource;
+use Elaf\Layout\Presentation\Filament\Ads\AdResource;
 use Elaf\Layout\Presentation\Filament\Homepage\HomepageBlockResource;
 use Elaf\Layout\Presentation\Filament\Menus\MenuResource;
 use Elaf\Publishing\Presentation\Filament\Issues\IssueResource;
@@ -64,6 +65,7 @@ final class AdminPanelProvider extends PanelProvider
                 PageResource::class,
                 MenuResource::class,
                 HomepageBlockResource::class,
+                AdResource::class,
             ])
             ->pages([Dashboard::class, ManageSettings::class])
             ->widgets([AccountWidget::class])

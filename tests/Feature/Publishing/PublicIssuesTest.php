@@ -155,6 +155,6 @@ it('runs a constant number of queries on the archive pages', function (string $p
 
     expect($after)->toBe($before)->and($before)->toBeLessThanOrEqual($max);
 })->with([
-    'index' => ['/issues', 6],
-    'issue' => ['/issues/5', 10],
+    'index' => ['/issues', 7],
+    'issue' => ['/issues/5', 11],
 ]);

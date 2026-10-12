@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Elaf\Layout\Presentation;
 
 use Elaf\Layout\Application\Homepage\BlockTypeCatalog;
+use Elaf\Layout\Infrastructure\Persistence\AdModel;
 use Elaf\Layout\Infrastructure\Persistence\HomepageBlockModel;
 use Elaf\Layout\Infrastructure\Persistence\MenuModel;
+use Elaf\Layout\Presentation\Ads\AdClickController;
+use Elaf\Layout\Presentation\Ads\AdSlots;
+use Elaf\Layout\Presentation\Homepage\Blocks\AdSlotBlock;
 use Elaf\Layout\Presentation\Homepage\Blocks\BreakingTickerBlock;
 use Elaf\Layout\Presentation\Homepage\Blocks\CategorySectionBlock;
 use Elaf\Layout\Presentation\Homepage\Blocks\ColumnistsBlock;
@@ -22,6 +26,7 @@ use Elaf\Layout\Presentation\Menus\LinkTypes\PageLink;
 use Elaf\Layout\Presentation\Menus\LinkTypes\UrlLink;
 use Elaf\Layout\Presentation\Menus\MenuLinkRegistry;
 use Elaf\Layout\Presentation\Menus\PublicMenus;
+use Elaf\Layout\Presentation\Policies\AdPolicy;
 use Elaf\Layout\Presentation\Policies\HomepageBlockPolicy;
 use Elaf\Layout\Presentation\Policies\MenuPolicy;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -44,6 +49,7 @@ final class LayoutPresentationServiceProvider extends ServiceProvider
         CategorySectionBlock::class,
         CurrentIssueBlock::class,
         ColumnistsBlock::class,
+        AdSlotBlock::class,
     ];
 
     /**
@@ -63,13 +69,18 @@ final class LayoutPresentationServiceProvider extends ServiceProvider
             array_map(static fn (string $class): Menus\MenuLinkType => $app->make($class), self::MENU_LINKS),
         ));
         $this->app->scoped(PublicMenus::class);
+        $this->app->scoped(AdSlots::class);
     }
 
     public function boot(Gate $gate): void
     {
         $gate->policy(MenuModel::class, MenuPolicy::class);
         $gate->policy(HomepageBlockModel::class, HomepageBlockPolicy::class);
+        $gate->policy(AdModel::class, AdPolicy::class);
 
-        Route::middleware('web')->get('/', HomeController::class)->name('home');
+        Route::middleware('web')->group(static function (): void {
+            Route::get('/', HomeController::class)->name('home');
+            Route::get('/ads/{id}/go', AdClickController::class)->whereNumber('id')->middleware('throttle:60,1')->name('ads.go');
+        });
     }
 }
