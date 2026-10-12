@@ -15,6 +15,7 @@ use Elaf\Publishing\Infrastructure\PublishingServiceProvider;
 use Elaf\Publishing\Presentation\PublishingPresentationServiceProvider;
 use Elaf\Search\Presentation\SearchPresentationServiceProvider;
 use Elaf\Settings\Infrastructure\SettingsServiceProvider;
+use Elaf\Settings\Presentation\SettingsPresentationServiceProvider;
 use Elaf\Shared\Infrastructure\SharedServiceProvider;
 use Elaf\Shared\Presentation\Filament\AdminPanelProvider;
 
@@ -32,6 +33,7 @@ return [
     LayoutPresentationServiceProvider::class,
     PublishingPresentationServiceProvider::class,
     SearchPresentationServiceProvider::class,
+    SettingsPresentationServiceProvider::class,
     AdminPanelProvider::class,
     WriterPanelProvider::class,
 ];

@@ -42,6 +42,10 @@ return [
     'no_pending_name_change' => 'لا يوجد طلب تغيير اسم.',
     'illegal_contributor_transition' => 'لا يمكن تنفيذ هذا الإجراء على الحساب في حالته الحالية.',
 
+    // Settings
+    'invalid_analytics_id' => 'معرّف الإحصاءات غير صالح (مثال: G-ABC123XYZ).',
+    'invalid_path' => 'مسار الملف غير صالح.',
+
     // Print issues
     'issue_number_taken' => 'العدد رقم :number موجود بالفعل.',
     'number_not_positive' => 'رقم العدد يجب أن يكون 1 أو أكثر.',

@@ -27,10 +27,15 @@
         <button type="button" class="flex h-tap w-tap shrink-0 items-center justify-center rounded-card text-brand lg:hidden" x-on:click="drawer = true" aria-label="{{ __('public.menu') }}">
             <x-svg-icon name="menu" class="h-6 w-6" />
         </button>
-        <a href="{{ route('home') }}" class="flex flex-1 flex-col items-center leading-none lg:flex-none lg:items-start" aria-label="{{ __('site.name') }}">
-            <span class="font-serif text-4xl font-black text-brand lg:text-6xl">{{ __('site.name') }}</span>
-            @if ($site['logo_suffix'] ?? null)
-                <span class="mt-1 text-sm font-bold text-accent lg:text-lg">{{ $site['logo_suffix'] }}</span>
+        <a href="{{ route('home') }}" class="flex flex-1 flex-col items-center leading-none lg:flex-none lg:items-start" aria-label="{{ $site['name'] ?? __('site.name') }}">
+            @if ($site['logo_url'] ?? null)
+                {{-- Uploaded logo (FR-SET-01): a fixed height keeps the header from shifting. --}}
+                <img src="{{ $site['logo_url'] }}" alt="{{ $site['name'] ?? __('site.name') }}" height="64" class="h-12 w-auto lg:h-20" fetchpriority="high">
+            @else
+                <span class="font-serif text-4xl font-black text-brand lg:text-6xl">{{ $site['name'] ?? __('site.name') }}</span>
+                @if ($site['logo_suffix'] ?? null)
+                    <span class="mt-1 text-sm font-bold text-accent lg:text-lg">{{ $site['logo_suffix'] }}</span>
+                @endif
             @endif
         </a>
         <div class="hidden lg:block">
@@ -105,7 +110,7 @@
         <div class="absolute inset-0 bg-black/50" x-on:click="drawer = false" x-transition.opacity></div>
         <div class="absolute inset-y-0 start-0 flex w-80 max-w-[85vw] flex-col overflow-y-auto bg-paper shadow-xl" role="dialog" aria-modal="true" aria-label="{{ __('public.menu') }}" x-show="drawer" x-transition>
             <div class="flex items-center justify-between border-b border-rule px-4 py-2">
-                <span class="font-serif text-2xl font-black text-brand">{{ __('site.name') }}</span>
+                <span class="font-serif text-2xl font-black text-brand">{{ $site['name'] ?? __('site.name') }}</span>
                 <button type="button" class="flex h-tap w-tap items-center justify-center" x-on:click="drawer = false" aria-label="{{ __('public.close') }}"><x-svg-icon name="close" class="h-6 w-6" /></button>
             </div>
             <ul class="py-2">

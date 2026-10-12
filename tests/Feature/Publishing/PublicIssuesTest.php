@@ -11,6 +11,7 @@ use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Identity\Domain\UserId;
 use Elaf\Publishing\Domain\Issue\IssueId;
 use Elaf\Publishing\Infrastructure\Persistence\IssueModel;
+use Elaf\Settings\Infrastructure\CachedSettingsReader;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\Support\Fakes\FrozenClock;
@@ -136,6 +137,7 @@ it('runs a constant number of queries on the archive pages', function (string $p
     };
     $count = function () use ($path): int {
         $this->app->forgetScopedInstances();
+        cache()->forget(CachedSettingsReader::CACHE_KEY);
         DB::flushQueryLog();
         DB::enableQueryLog();
         $this->get($path)->assertOk();

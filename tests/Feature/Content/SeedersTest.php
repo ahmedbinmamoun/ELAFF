@@ -6,6 +6,7 @@ use App\Models\User;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\DemoContentSeeder;
 use Database\Seeders\DemoIssuesSeeder;
+use Database\Seeders\DemoPagesSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Elaf\Content\Application\ContentPermission as P;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
@@ -14,6 +15,7 @@ use Elaf\Contributors\Application\ContributorPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
 use Elaf\Publishing\Application\IssuePermission;
+use Elaf\Settings\Application\SettingsPermission;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 
@@ -31,8 +33,8 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
     'writer' => [Role::Writer, [P::CreateArticles]],
     'contributor' => [Role::Contributor, [P::CreateArticles]],
     'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors]],
-    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, P::PublishArticles, P::PromoteArticles, IssuePermission::ManageIssues]],
-    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers, IssuePermission::ManageIssues]],
+    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, P::PublishArticles, P::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages]],
+    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers, IssuePermission::ManageIssues, ...SettingsPermission::cases()]],
 ]);
 
 it('seeds the website sections with icons once, without overwriting edits (FR-TAX-01)', function (): void {
@@ -71,4 +73,11 @@ it('seeds demo print issues once, the latest with linked articles', function ():
         ->and($issues->last()?->published_on->format('l'))->toBe('Thursday')
         ->and(ArticleModel::query()->where('issue_id', $issues->last()?->id)->count())->toBe(8);
     Illuminate\Support\Facades\Queue::assertPushed(Elaf\Publishing\Infrastructure\Processing\ProcessIssuePdfJob::class, DemoIssuesSeeder::ISSUES);
+});
+
+it('seeds the demo static pages once', function (): void {
+    $this->seed([DemoPagesSeeder::class, DemoPagesSeeder::class]);
+
+    expect(Elaf\Settings\Infrastructure\Persistence\PageModel::query()->orderBy('slug')->pluck('slug')->all())
+        ->toBe(['about', 'advertise', 'contact', 'privacy']);
 });

@@ -8,8 +8,10 @@ use Elaf\Content\Application\Query\ArticleLink;
 use Elaf\Content\Application\Query\ArticleQueries;
 use Elaf\Content\Application\Query\CategoryRef;
 use Elaf\Content\Application\Query\TaxonomyQueries;
+use Elaf\Settings\Application\Site\SettingsReader;
 use Elaf\Shared\Domain\Time\Clock;
 use Elaf\Shared\Presentation\ArabicDate;
+use Elaf\Shared\Presentation\PublicMedia;
 use Illuminate\Contracts\Config\Repository;
 
 /**
@@ -26,6 +28,7 @@ final class PublicChrome
         private readonly ArticleQueries $articles,
         private readonly Clock $clock,
         private readonly Repository $config,
+        private readonly SettingsReader $settings,
     ) {}
 
     /**
@@ -59,12 +62,40 @@ final class PublicChrome
     }
 
     /**
+     * Site identity from the settings (FR-SET-01), in the shape the views use.
+     *
      * @return array<string, mixed>
      */
     private function site(): array
     {
-        $site = $this->config->get('elaf.site');
+        $s = $this->settings->site();
+        $footerLinks = $this->config->get('elaf.site.footer_links');
 
-        return is_array($site) ? array_filter($site, is_string(...), ARRAY_FILTER_USE_KEY) : [];
+        return [
+            'name' => $s->name,
+            'logo_suffix' => $s->logoSuffix,
+            'motto' => $s->motto,
+            'description' => $s->description,
+            'logo_url' => $s->logoPath === null ? null : PublicMedia::url($s->logoPath),
+            'favicon_url' => $s->faviconPath === null ? null : PublicMedia::url($s->faviconPath),
+            'og_image_url' => $s->defaultOgImagePath === null ? null : PublicMedia::url($s->defaultOgImagePath),
+            'email' => $s->contactEmail,
+            'phone' => $s->phone,
+            'address' => $s->address,
+            'footer_text' => $s->footerText,
+            'analytics_id' => $s->analyticsId,
+            'masthead' => [
+                'editor_in_chief' => $s->mastheadEditorInChief,
+                'editorial_advisor' => $s->mastheadEditorialAdvisor,
+                'publisher' => $s->mastheadPublisher,
+            ],
+            'social' => [
+                'facebook' => $s->facebookUrl,
+                'whatsapp' => $s->whatsappUrl,
+                'youtube' => $s->youtubeUrl,
+                'x' => $s->xUrl,
+            ],
+            'footer_links' => is_array($footerLinks) ? $footerLinks : [],
+        ];
     }
 }
