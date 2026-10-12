@@ -14,6 +14,7 @@ final class Icons
     /** Icons offered for sections (categories), with their Arabic label. */
     public const SECTION_ICONS = [
         'map' => 'خريطة',
+        'mail' => 'بريد',
         'chart' => 'رسم بياني',
         'flame' => 'شعلة',
         'landmark' => 'مبنى حكومي',

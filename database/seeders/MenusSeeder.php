@@ -52,6 +52,10 @@ final class MenusSeeder extends Seeder
             ->map(static fn (PageModel $p): MenuItemData => new MenuItemData($p->title, MenuItemType::Page, $p->id, null, null, true))
             ->all());
 
-        return [...$pages, new MenuItemData((string) __('public.issues_page.title'), MenuItemType::Issues, null, null, 'newspaper', true)];
+        return [
+            ...$pages,
+            new MenuItemData((string) __('public.issues_page.title'), MenuItemType::Issues, null, null, 'newspaper', true),
+            new MenuItemData((string) __('public.letters.title'), MenuItemType::Url, null, '/letters', 'mail', true),
+        ];
     }
 }

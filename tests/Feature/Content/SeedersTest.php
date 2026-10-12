@@ -12,6 +12,7 @@ use Elaf\Content\Application\ContentPermission as P;
 use Elaf\Content\Infrastructure\Persistence\Models\ArticleModel;
 use Elaf\Content\Infrastructure\Persistence\Models\CategoryModel;
 use Elaf\Contributors\Application\ContributorPermission;
+use Elaf\Engagement\Application\EngagementPermission;
 use Elaf\Identity\Application\IdentityPermission;
 use Elaf\Identity\Application\Role;
 use Elaf\Layout\Application\LayoutPermission;
@@ -33,9 +34,9 @@ it('grants each role exactly its PRD §2 permissions', function (Role $role, arr
 })->with([
     'writer' => [Role::Writer, [P::CreateArticles]],
     'contributor' => [Role::Contributor, [P::CreateArticles]],
-    'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors]],
-    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, P::PublishArticles, P::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages, LayoutPermission::ManageHomepage, LayoutPermission::ManageMenus, LayoutPermission::ManageAds]],
-    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers, IssuePermission::ManageIssues, ...SettingsPermission::cases(), ...LayoutPermission::cases()]],
+    'editor' => [Role::Editor, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, EngagementPermission::ModerateLetters]],
+    'editor-in-chief' => [Role::EditorInChief, [P::CreateArticles, P::EditAnyArticle, P::ReviewArticles, P::ManageTaxonomy, P::ManageAuthors, ContributorPermission::ManageContributors, EngagementPermission::ModerateLetters, P::PublishArticles, P::PromoteArticles, IssuePermission::ManageIssues, SettingsPermission::ManagePages, LayoutPermission::ManageHomepage, LayoutPermission::ManageMenus, LayoutPermission::ManageAds]],
+    'admin' => [Role::Admin, [...P::cases(), ContributorPermission::ManageContributors, IdentityPermission::ManageUsers, IssuePermission::ManageIssues, ...SettingsPermission::cases(), ...LayoutPermission::cases(), ...EngagementPermission::cases()]],
 ]);
 
 it('seeds the website sections with icons once, without overwriting edits (FR-TAX-01)', function (): void {
@@ -44,7 +45,7 @@ it('seeds the website sections with icons once, without overwriting edits (FR-TA
     $this->seed([CategorySeeder::class, RolesAndPermissionsSeeder::class, RolesAndPermissionsSeeder::class]);
 
     expect(CategoryModel::query()->orderBy('sort_order')->pluck('slug')->all())->toBe([
-        'أخبار-السودان', 'الاقتصاد', 'النفط-والطاقة', 'السياسة', 'العالم', 'تقارير-وتحقيقات', 'آراء-وكتابات', 'مقالات', 'منوعات',
+        'أخبار-السودان', 'الاقتصاد', 'النفط-والطاقة', 'السياسة', 'العالم', 'تقارير-وتحقيقات', 'آراء-وكتابات', 'مقالات', 'منوعات', 'بريد-القراء',
     ])
         ->and(CategoryModel::query()->where('slug', 'الاقتصاد')->value('name'))->toBe('اقتصاد وأعمال')
         ->and(CategoryModel::query()->whereNull('icon')->count())->toBe(0)

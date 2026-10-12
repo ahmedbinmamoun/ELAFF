@@ -10,6 +10,7 @@ use Elaf\Content\Presentation\Filament\Resources\Categories\CategoryResource;
 use Elaf\Content\Presentation\Filament\Resources\Series\SeriesResource;
 use Elaf\Content\Presentation\Filament\Resources\Tags\TagResource;
 use Elaf\Contributors\Presentation\Filament\Admin\Contributors\ContributorResource;
+use Elaf\Engagement\Presentation\Filament\Letters\ReaderLetterResource;
 use Elaf\Identity\Presentation\Filament\Resources\Users\UserResource;
 use Elaf\Layout\Presentation\Filament\Ads\AdResource;
 use Elaf\Layout\Presentation\Filament\Homepage\HomepageBlockResource;
@@ -56,6 +57,7 @@ final class AdminPanelProvider extends PanelProvider
             ->resources([
                 ArticleResource::class,
                 IssueResource::class,
+                ReaderLetterResource::class,
                 ContributorResource::class,
                 CategoryResource::class,
                 TagResource::class,

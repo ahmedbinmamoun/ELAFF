@@ -29,6 +29,8 @@ final class CategorySeeder extends Seeder
         ['آراء وكتابات', 'pen', true],
         ['مقالات', 'book', true],
         ['منوعات', 'grid', false],
+        // Reader letters turned into articles (FR-LET-02).
+        ['بريد القراء', 'mail', false],
     ];
 
     public function run(): void

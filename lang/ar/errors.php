@@ -52,6 +52,14 @@ return [
     'invalid_block_option' => 'إعدادات الكتلة غير صالحة.',
     'stale_block_order' => 'تغيّرت قائمة الكتل في الأثناء، أعد تحميل الصفحة.',
 
+    // Reader letters
+    'letter_name' => 'الاسم مطلوب ولا يتجاوز 100 حرف.',
+    'letter_title' => 'العنوان مطلوب ولا يتجاوز 150 حرفاً.',
+    'letter_body' => 'نص الرسالة من 20 إلى 5000 حرف.',
+    'letter_already_moderated' => 'رُوجعت هذه الرسالة من قبل.',
+    'letter_not_approved' => 'اقبل الرسالة أولاً ثم حوّلها إلى مقال.',
+    'letter_already_converted' => 'حُوّلت هذه الرسالة إلى مقال من قبل.',
+
     // Ads
     'unknown_ad_slot' => 'مكان الإعلان غير صالح.',
     'ad_creative_required' => 'ارفع صورة أو أضف كود HTML.',
